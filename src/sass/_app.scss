@@ -1,0 +1,51 @@
+.app{
+  height: 100%;
+  .logo{
+    height: 64px;
+    padding: 16px;
+    background: #313653;
+    div{
+      background: #fff;
+      height: 100%;
+      border-radius: 5px;
+    }
+  }
+  .trigger{
+    font-size: 18px;
+    line-height: 64px;
+    color: #fff;
+    cursor: pointer;
+    transition: color .3s;
+    &:hover {
+      color: #1890ff;
+    }
+  }
+  .ant-layout-sider{
+    .ant-layout-sider-children{
+      overflow: auto;
+      &::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      &::-webkit-scrollbar-thumb {
+        background: #777;
+      }
+    }
+  }
+  .ant-layout-header{
+    padding-left: 24px;
+    background: #313653;
+  }
+  .ant-layout-content{
+    min-height: auto !important;
+  }
+  .ant-layout{
+    &::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: #777;
+    }
+  }
+}
