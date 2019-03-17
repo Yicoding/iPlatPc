@@ -17,6 +17,7 @@ export default class App extends Component {
   };
   // 页面初始化
   componentWillMount() {
+    // 用户登录获取角色
     setTimeout(() => {
       this.setState({ role: 'root' })
     }, 500)

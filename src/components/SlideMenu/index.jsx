@@ -1,40 +1,29 @@
 import React, { Component } from 'react'
-import { Link, withRouter } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import {
   Layout, Menu, Icon,
 } from 'antd';
 
-import AllComponents from '../../modules';
 import config from '../../routes/config';
 
 const { Sider } = Layout;
 
-class SlideMenu extends Component {
+
+export default class SlideMenu extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      defaultKey: ''
+      routeKey: ''
     }
   }
   componentDidMount() {
     let { pathname } = window.location
-    console.log(pathname)
-    setTimeout(() => {
-
-      this.setState({
-        defaultKey: pathname
-      })
-    }, 1000)
+    this.setState({ routeKey: pathname })
   }
-  // 确定key
-  _renderKey = role => {
-    if (role) {
-      let routeList = config[role]
-      // alert(routeList[0].route)
-      return [routeList[0].route]
-    }
-    return []
+  // 设置menu菜单高亮
+  setKey(routeKey) {
+    this.setState({ routeKey })
   }
   // 渲染列表
   _renderList = role => {
@@ -44,7 +33,7 @@ class SlideMenu extends Component {
         routeList && routeList.length > 0 && routeList.map(item => {
           return (
             <Menu.Item key={item.route}>
-              <Link to={item.route}>
+              <Link to={item.route} onClick={() => this.setKey(item.route)}>
                 <Icon type={item.icon} />
                 <span>{item.name}</span>
               </Link>
@@ -57,7 +46,7 @@ class SlideMenu extends Component {
   }
   render() {
     const { role, collapsed } = this.props
-    let { defaultKey } = this.state
+    let { routeKey } = this.state
     return (
       <Sider
         trigger={null}
@@ -67,12 +56,10 @@ class SlideMenu extends Component {
         <div className="logo">
           <div />
         </div>
-        <Menu mode="inline" defaultSelectedKeys={[defaultKey]}>
+        <Menu mode="inline" selectedKeys={[routeKey]}>
           {this._renderList(role)}
         </Menu>
       </Sider>
     )
   }
 }
-
-export default withRouter(SlideMenu);
