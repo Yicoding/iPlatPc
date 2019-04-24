@@ -18,8 +18,9 @@ export default class SlideMenu extends Component {
     }
   }
   componentDidMount() {
-    let { pathname } = window.location
-    this.setState({ routeKey: pathname })
+    console.log(window.location)
+    let { hash } = window.location
+    this.setState({ routeKey: hash.slice(1) })
   }
   // 设置menu菜单高亮
   setKey(routeKey) {
