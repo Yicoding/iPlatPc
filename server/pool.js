@@ -1,9 +1,10 @@
-var mysql = require('mysql')
-var pool  = mysql.createPool({
+let mysql = require('mysql')
+let pool  = mysql.createPool({
 	host: 'localhost',
 	user: 'root',
 	password: 'root',
 	port: '3306',
-	database: 'test'
+	database: 'iplat'
 })
+
 module.exports = pool
