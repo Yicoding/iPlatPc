@@ -1,6 +1,8 @@
 import React, { Component } from 'react'
 import { Table } from 'antd';
 
+import { api } from '../../api/index.js'
+
 const { Column } = Table;
 
 export default class Home extends Component {
@@ -10,10 +12,11 @@ export default class Home extends Component {
       dataList: []
     }
   }
-  componentDidMount() {
+  async componentDidMount() {
     let dataList = []
     for (let i = 0; i < 10; i++) {
       dataList.push({
+        key: i,
         id: i,
         name: `花世界${i}`,
         admin: {
@@ -23,6 +26,8 @@ export default class Home extends Component {
       })
     }
     this.setState({ dataList })
+    let data = await api.getCompanyList()
+    console.log(data)
   }
   render() {
     let { dataList } = this.state
