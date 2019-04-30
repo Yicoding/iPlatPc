@@ -13,7 +13,6 @@ export function promiseHandler(options) {
       url: options.url,
       data: options.data
     }).then(response => {
-      console.log(response)
       let { status, data } = response;
       if (status === 200) {
         return resolve(data);

@@ -1,11 +1,19 @@
+/**
+ * company
+ */
 import React, { Component } from 'react'
 import { Table } from 'antd';
 
 import { api } from '../../api/index.js'
 
-const { Column } = Table;
-
 export default class Home extends Component {
+  columns = [
+    { title: 'id', dataIndex: 'id', key: 'id' },
+    { title: '公司名称', dataIndex: 'name', key: 'name' },
+    { title: '创建时间', dataIndex: 'createTime', key: 'createTime' },
+    { title: '标志', dataIndex: 'logo', key: 'logo' },
+    { title: '公司描述', dataIndex: 'desc', key: 'desc' },
+  ]
   constructor(props) {
     super(props)
     this.state = {
@@ -13,48 +21,17 @@ export default class Home extends Component {
     }
   }
   async componentDidMount() {
-    let dataList = []
-    for (let i = 0; i < 10; i++) {
-      dataList.push({
-        key: i,
-        id: i,
-        name: `花世界${i}`,
-        admin: {
-          name: `梅花${i}`,
-        },
-        info: '花世界是一家世外桃源'
-      })
-    }
     this.setState({ dataList })
-    let data = await api.getCompanyList()
-    console.log(data)
+    let dataList = await api.getCompanyList()
+    console.log(dataList)
+    this.setState({ dataList })
   }
   render() {
+    let { columns } = this
     let { dataList } = this.state
     return (
       <div>
-        <Table dataSource={dataList}>
-          <Column
-            title="id"
-            dataIndex="id"
-            key="id"
-          />
-          <Column
-            title="公司名称"
-            dataIndex="name"
-            key="name"
-          />
-          <Column
-            title="管理员"
-            dataIndex="admin.name"
-            key="admin.name"
-          />
-          <Column
-            title="公司信息"
-            dataIndex="info"
-            key="info"
-          />
-        </Table>
+        <Table columns={columns} dataSource={dataList} rowKey="id" />
       </div>
     )
   }
