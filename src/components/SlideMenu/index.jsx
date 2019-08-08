@@ -55,7 +55,7 @@ export default class SlideMenu extends Component {
         theme="light"
         collapsed={collapsed} >
         <div className="logo">
-          <div />
+          <div></div>
         </div>
         <Menu mode="inline" selectedKeys={[routeKey]}>
           {this._renderList(role)}

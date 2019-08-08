@@ -21,10 +21,13 @@ export default class Home extends Component {
     }
   }
   async componentDidMount() {
-    this.setState({ dataList })
-    let dataList = await api.getCompanyList()
-    console.log(dataList)
-    this.setState({ dataList })
+    try {
+      let { data } = await api.getCompanyList()
+      console.log(data)
+      this.setState({ dataList: data })
+    } catch(e) {
+      console.log('getCompanyList报错', e)
+    }
   }
   render() {
     let { columns } = this

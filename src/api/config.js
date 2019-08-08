@@ -5,7 +5,7 @@
  * prd: 生产
  */
 
-const env = 'dev';
+const env = 'test';
 
 function useConfig() {
 

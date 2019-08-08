@@ -131,5 +131,6 @@
     "presets": [
       "react-app"
     ]
-  }
+  },
+  "proxy": "https://0az3korx.qcloud.la/weapp"
 }
