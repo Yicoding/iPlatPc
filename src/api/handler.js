@@ -5,9 +5,9 @@ import axios from 'axios';
 
 export function promiseHandler(options) {
   return new Promise((resolve, reject) => {
-    if (options.method === 'POST' || options.method === 'PUT') {
-      options.data = JSON.stringify(options.data)
-    }
+    // if (options.method === 'POST' || options.method === 'PUT') {
+    //   options.data = JSON.stringify(options.data)
+    // }
     axios({
       method: options.method,
       url: options.url,
