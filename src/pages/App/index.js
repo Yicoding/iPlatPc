@@ -1,4 +1,7 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import store from '../../store';
+import { setUserInfo } from '../../actions'
 
 import {
   Icon,
@@ -10,18 +13,24 @@ import SlideMenu from '../../components/SlideMenu';
 
 const { Header, Content } = Layout;
 
-export default class App extends Component {
+class App extends Component {
   state = {
     collapsed: false,
     role: '',
   };
   // 页面初始化
   componentWillMount() {
-    // 用户登录获取角色
+    this.getLogin()
+  }
+  // 用户登录获取角色
+  getLogin() {
+    let userInfo = this.props.userInfo
+    console.log('userInfo', userInfo)
     setTimeout(() => {
-      this.setState({ role: 'root' })
+      this.setState({ role: 'admin' })
     }, 500)
   }
+  // 收起展开菜单
   toggle = () => {
     this.setState({
       collapsed: !this.state.collapsed,
@@ -54,3 +63,12 @@ export default class App extends Component {
     )
   }
 }
+
+
+const mapStateToProps = function(store) {
+  return {
+    userInfo: store.userInfo
+  };
+};
+
+export default connect(mapStateToProps)(App);

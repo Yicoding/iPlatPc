@@ -8,7 +8,7 @@ import {
   Modal,
   Form,
   Input,
-  message,
+  message
 } from 'antd';
 
 
