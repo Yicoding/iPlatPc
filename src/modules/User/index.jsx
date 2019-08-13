@@ -32,7 +32,9 @@ class Role extends Component {
     )},
   ]
   children = []
+  roles = []
   options = []
+  optionsRole = []
   type = ''
   id = 0
   constructor(props) {
@@ -47,6 +49,7 @@ class Role extends Component {
   componentDidMount() {
     this.getUserList()
     this.getCompanyList()
+    this.getRoleList()
   }
   // 获取用户列表
   async getUserList() {
@@ -70,6 +73,18 @@ class Role extends Component {
       console.log('getCompanyList报错', e)
     }
   }
+  // 获取角色列表
+  async getRoleList() {
+    const { Option } = Select;
+    try {
+      let { data } = await api.getRoleList()
+      console.log(data)
+      this.optionsRole = data
+      this.roles = data.map(item => <Option key={item.id} value={item.id}>{item.fullName}</Option>)
+    } catch(e) {
+      console.log('getRoleList', e)
+    }
+  }
   // 新增按钮
   add = () => {
     console.log('add');
@@ -77,7 +92,13 @@ class Role extends Component {
     let { form } = this.props
     form.setFieldsValue({
       name: '',
-      company_id: ''
+      phone: '',
+      password: '',
+      age: '',
+      company_id: '',
+      role_id: '',
+      sign: '',
+      avatar: ''
     });
     this.setState({
       title: '新增用户',
@@ -92,7 +113,13 @@ class Role extends Component {
     let { form } = this.props
     form.setFieldsValue({
       name: text.name,
-      company_id: text.company_id
+      phone: text.phone,
+      password: text.password,
+      age: text.age,
+      company_id: text.company_id,
+      role_id: text.role_id,
+      sign: text.sign,
+      avatar: text.avatar
     });
     this.setState({
       title: '编辑用户',
@@ -138,9 +165,11 @@ class Role extends Component {
       if (err) {
         return console.log('handleOkError', err)
       }
-      console.log('form', values)
+      console.log('form', values);
       let index = this.options.findIndex(item => item.id === values.company_id)
       let companyName = this.options[index].name
+      let roleIndex = this.options.findIndex(item => item.id === values.role_id)
+      let role_fullName = this.optionsRole[roleIndex].fullName
       try {
         this.setState({ confirmLoading: true })
         let info = '创建成功，用户家族又添新同胞啦'
@@ -151,8 +180,15 @@ class Role extends Component {
           dataList.push({
             id: data.id,
             name: values.name,
+            phone: values.phone,
+            password: values.password,
+            age: values.age,
             company_id: values.company_id,
-            companyName: companyName
+            companyName: companyName,
+            role_id: values.role_id,
+            role_fullName: role_fullName,
+            sign: values.sign,
+            avatar: values.avatar
           })
           this.setState({ dataList })
         } else {
@@ -164,8 +200,16 @@ class Role extends Component {
           let item = dataList[index]
           Object.assign(item, {
             name: values.name,
+            name: values.name,
+            phone: values.phone,
+            password: values.password,
+            age: values.age,
             company_id: values.company_id,
-            companyName: companyName
+            companyName: companyName,
+            role_id: values.role_id,
+            role_fullName: role_fullName,
+            sign: values.sign,
+            avatar: values.avatar
           })
         }
         this.setState({
@@ -187,18 +231,14 @@ class Role extends Component {
   handleCancel = () => {
     this.setState({ visible: false })
   }
-  // 公司选择
-  handleSelectChange = value => {
-    console.log(value);
-  }
   render() {
     let {
       add,
       columns,
       children,
+      roles,
       handleOk,
-      handleCancel,
-      handleSelectChange
+      handleCancel
     } = this
     let {
       dataList,
@@ -238,8 +278,8 @@ class Role extends Component {
                 })(<Input className="form-input" placeholder="请输入密码" />)}
               </Form.Item>
               <Form.Item label="年龄">
-                {getFieldDecorator('name', {
-                  rules: [{ required: true, whitespace: true, message: '请输入年龄' }]
+                {getFieldDecorator('age', {
+                  rules: [{ message: '请输入年龄' }]
                 })(<Input className="form-input" placeholder="请输入年龄" />)}
               </Form.Item>
               <Form.Item label="所属公司">
@@ -247,10 +287,28 @@ class Role extends Component {
                   rules: [{ required: true, message: '请选择所属公司' }]
                 })(<Select
                   notFoundContent="暂未找到"
-                  placeholder="请选择所属公司"
-                  onChange={handleSelectChange} >
+                  placeholder="请选择所属公司" >
                   {children}
                 </Select>)}
+              </Form.Item>
+              <Form.Item label="角色">
+                {getFieldDecorator('role_id', {
+                  rules: [{ required: true, message: '请选择所属角色' }]
+                })(<Select
+                  notFoundContent="暂未找到"
+                  placeholder="请选择所属角色" >
+                  {roles}
+                </Select>)}
+              </Form.Item>
+              <Form.Item label="个性签名">
+                {getFieldDecorator('sign', {
+                  rules: [{ message: '请输入个性签名' }]
+                })(<Input className="form-input" placeholder="请输入个性签名" />)}
+              </Form.Item>
+              <Form.Item label="头像地址">
+                {getFieldDecorator('avatar', {
+                  rules: [{ message: '请输入头像地址' }]
+                })(<Input className="form-input" placeholder="请输入头像地址" />)}
               </Form.Item>
             </Form>
         </Modal>

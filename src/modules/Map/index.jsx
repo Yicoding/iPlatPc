@@ -183,18 +183,13 @@ class Role extends Component {
   handleCancel = () => {
     this.setState({ visible: false })
   }
-  // 公司选择
-  handleSelectChange = value => {
-    console.log(value);
-  }
   render() {
     let {
       add,
       columns,
       children,
       handleOk,
-      handleCancel,
-      handleSelectChange
+      handleCancel
     } = this
     let {
       dataList,
@@ -228,8 +223,7 @@ class Role extends Component {
                   rules: [{ required: true, message: '请选择所属公司' }]
                 })(<Select
                   notFoundContent="暂未找到"
-                  placeholder="请选择所属公司"
-                  onChange={handleSelectChange} >
+                  placeholder="请选择所属公司" >
                   {children}
                 </Select>)}
               </Form.Item>
