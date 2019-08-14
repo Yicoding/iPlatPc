@@ -8,11 +8,13 @@ export function promiseHandler(options) {
     // if (options.method === 'POST' || options.method === 'PUT') {
     //   options.data = JSON.stringify(options.data)
     // }
-    axios({
+    let requestBody = {
       method: options.method,
-      url: options.url,
-      data: options.data
-    }).then(response => {
+      url: options.url
+    }
+    let key = (options.method === 'POST' || options.method === 'PUT') ? 'data' : 'params'
+    requestBody[key] = options.data
+    axios(requestBody).then(response => {
       let { status, data } = response;
       if (status === 200) {
         return resolve(data);

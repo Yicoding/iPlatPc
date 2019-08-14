@@ -3,8 +3,13 @@ import {
   Icon,
   Button,
   Form,
-  Input
+  Input,
+  message
 } from 'antd';
+import { connect } from 'react-redux';
+import { setUserInfo } from '../../actions'
+import store from '../../store';
+
 
 import { api } from '../../api/index.js'
 
@@ -25,9 +30,19 @@ class Login extends Component {
   }
   // 用户登录
   async userLogin(values) {
+    const { loginOk } = this.props
     try {
-      let { data } = await api.userLogin(values)
+      let { code, data } = await api.userLogin(values)
       console.log(data);
+      if (code === 0) {
+        message.success('恭喜你，登录成功');
+        loginOk(data)
+        setTimeout(() => {
+          this.props.history.push('/app')
+        }, 1000)
+      } else {
+        message.error(data);
+      }
     } catch(e) {
       console.log('handleSubmit', e)
     }
@@ -46,7 +61,7 @@ class Login extends Component {
                 })(<Input placeholder="账号" size="large" prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} />)}
               </Form.Item>
               <Form.Item>
-                {getFieldDecorator('passowrd', {
+                {getFieldDecorator('password', {
                   rules: [{ required: true, whitespace: true, message: '请输入密码' }]
                 })(<Input.Password prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="密码" size="large" />)}
               </Form.Item>
@@ -64,4 +79,18 @@ class Login extends Component {
 
 const WrappedHorizontalLoginForm = Form.create({ name: 'Login' })(Login)
 
-export default WrappedHorizontalLoginForm
+const mapStateToProps = function(store) {
+  return {
+    userInfo: store.userInfo
+  };
+};
+
+const mapDispatchToProps = function(dispatch, ownProps) {
+  return {
+    loginOk: (data) => {
+      dispatch(setUserInfo(data))
+    }
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(WrappedHorizontalLoginForm);
