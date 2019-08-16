@@ -8,7 +8,7 @@ import Login from './pages/Login';
 
 // redux
 import { Provider } from 'react-redux'
-import store from './store'
+import store from './redux/store'
 
 export default () => (
   <Provider store={store}>

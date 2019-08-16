@@ -12,6 +12,7 @@ import {
   Select
 } from 'antd';
 
+import { connect } from 'react-redux';
 import { api } from '../../api/index.js'
 
 class Role extends Component {
@@ -47,7 +48,11 @@ class Role extends Component {
   // 获取类型列表
   async getGoodsTypeList() {
     try {
-      let { data } = await api.getGoodsTypeList()
+      const { userInfo } = this.props
+      let { data } = await api.getGoodsTypeList({
+        role_id: userInfo.role_id,
+        company_id: userInfo.company_id
+      })
       console.log(data)
       this.setState({ dataList: data })
     } catch(e) {
@@ -236,4 +241,10 @@ class Role extends Component {
 
 const WrappedHorizontalLoginForm = Form.create({ name: 'Role' })(Role)
 
-export default WrappedHorizontalLoginForm
+const mapStateToProps = function(store) {
+  return {
+    userInfo: store.userInfo
+  };
+};
+
+export default connect(mapStateToProps)(WrappedHorizontalLoginForm);

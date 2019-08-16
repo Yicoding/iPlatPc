@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import 'antd/dist/antd.css';
-import './sass/style.scss';
+import './common/css/style.scss';
 
 import Page from './Page';
 import * as serviceWorker from './serviceWorker';

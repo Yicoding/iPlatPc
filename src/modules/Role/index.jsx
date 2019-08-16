@@ -43,7 +43,9 @@ class Role extends Component {
   // 获取角色列表
   async getRoleList() {
     try {
-      let { data } = await api.getRoleList()
+      let { data } = await api.getRoleList({
+        all: true
+      })
       console.log(data)
       this.setState({ dataList: data })
     } catch(e) {

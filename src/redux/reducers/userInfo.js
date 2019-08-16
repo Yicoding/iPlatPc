@@ -1,4 +1,4 @@
-const userInfo = (state = {id: 1, name: 'Ecode'}, action) => {
+const userInfo = (state = {}, action) => {
     const { type, userInfo } = action
     switch (type) {
         case 'SET_USERINFO':

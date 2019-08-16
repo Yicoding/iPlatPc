@@ -12,9 +12,10 @@ import {
   Select
 } from 'antd';
 
+import { connect } from 'react-redux';
 import { api } from '../../api/index.js'
 
-class Role extends Component {
+class User extends Component {
   columns = [
     { title: 'id', dataIndex: 'id', key: 'id', align: 'center' },
     { title: '用户名', dataIndex: 'name', key: 'name', align: 'center' },
@@ -54,7 +55,12 @@ class Role extends Component {
   // 获取用户列表
   async getUserList() {
     try {
-      let { data } = await api.getUserList()
+      const { userInfo } = this.props
+      let { data } = await api.getUserList({
+        id: userInfo.id,
+        role_id: userInfo.role_id,
+        company_id: userInfo.company_id
+      })
       console.log(data)
       this.setState({ dataList: data })
     } catch(e) {
@@ -77,7 +83,12 @@ class Role extends Component {
   async getRoleList() {
     const { Option } = Select;
     try {
-      let { data } = await api.getRoleList()
+      const { userInfo } = this.props
+      let value = {}
+      if (userInfo.id == 1) { // 系统管理员
+        value = { all: true }
+      }
+      let { data } = await api.getRoleList(value)
       console.log(data)
       this.optionsRole = data
       this.roles = data.map(item => <Option key={item.id} value={item.id}>{item.fullName}</Option>)
@@ -168,7 +179,8 @@ class Role extends Component {
       console.log('form', values);
       let index = this.options.findIndex(item => item.id === values.company_id)
       let companyName = this.options[index].name
-      let roleIndex = this.options.findIndex(item => item.id === values.role_id)
+      let roleIndex = this.optionsRole.findIndex(item => item.id === values.role_id)
+      // return console.log('roleIndex:', index, this.options, companyName,  this.optionsRole, roleIndex)
       let role_fullName = this.optionsRole[roleIndex].fullName
       try {
         this.setState({ confirmLoading: true })
@@ -317,6 +329,12 @@ class Role extends Component {
   }
 }
 
-const WrappedHorizontalLoginForm = Form.create({ name: 'Role' })(Role)
+const WrappedHorizontalLoginForm = Form.create({ name: 'User' })(User)
 
-export default WrappedHorizontalLoginForm
+const mapStateToProps = function(store) {
+  return {
+    userInfo: store.userInfo
+  };
+};
+
+export default connect(mapStateToProps)(WrappedHorizontalLoginForm);

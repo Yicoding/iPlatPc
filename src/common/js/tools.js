@@ -28,6 +28,6 @@ function changeDate(time, format) {
     })
 }
 
-module.exports = {
+export {
     changeDate
 }

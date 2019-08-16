@@ -7,8 +7,7 @@ import {
   message
 } from 'antd';
 import { connect } from 'react-redux';
-import { setUserInfo } from '../../actions'
-import store from '../../store';
+import { setUserInfo } from '../../redux/actions'
 
 
 import { api } from '../../api/index.js'
@@ -36,9 +35,13 @@ class Login extends Component {
       console.log(data);
       if (code === 0) {
         message.success('恭喜你，登录成功');
+        // 存到redux
         loginOk(data)
+        // 存到本地
+        
+        // 跳转到主页
         setTimeout(() => {
-          this.props.history.push('/app')
+          this.props.history.replace('/app/goods')
         }, 1000)
       } else {
         message.error(data);
