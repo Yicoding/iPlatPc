@@ -8,12 +8,21 @@ import {
 } from 'antd';
 import { connect } from 'react-redux';
 import { setUserInfo } from '../../redux/actions'
-
+import Store from '../../common/js/storage'
 
 import { api } from '../../api/index.js'
 
 class Login extends Component {
+  userInfoStore = Store.userInfoStore
   componentDidMount() {
+    this.getLocalInfo()
+  }
+  // 取本地用户信息
+  getLocalInfo() {
+    let data = this.userInfoStore.get()
+    if (data) {
+      this.props.history.replace('/app/goods')
+    }
   }
   // 用户登录
   handleSubmit = e => {
@@ -38,7 +47,7 @@ class Login extends Component {
         // 存到redux
         loginOk(data)
         // 存到本地
-        
+        this.userInfoStore.set(data)        
         // 跳转到主页
         setTimeout(() => {
           this.props.history.replace('/app/goods')

@@ -38,10 +38,9 @@ class App extends Component {
         loginOk(data.value)
         userInfo = data.value
       }
-    } else { // 登录获取用户信息，存储到本地
-      this.userInfoStore.set(userInfo)
     }
     console.log('userInfo', userInfo)
+    // console.log()
     this.setState({ role: userInfo.role_name })
   }
   // 收起展开菜单
