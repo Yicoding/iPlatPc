@@ -40,8 +40,14 @@ class App extends Component {
       }
     }
     console.log('userInfo', userInfo)
-    // console.log()
-    this.setState({ role: userInfo.role_name })
+    let { hash } = window.location
+    let string = hash.split('?')[1]
+    console.log('string**', string)
+    if (string) {
+      this.setState({ role: 'admin' })
+    } else {
+      this.setState({ role: userInfo.role_name })
+    }
   }
   // 收起展开菜单
   toggle = () => {

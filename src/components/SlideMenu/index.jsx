@@ -20,11 +20,9 @@ export default class SlideMenu extends Component {
   componentDidMount() {
     console.log(window.location)
     let { hash } = window.location
-    // let a = hash.replace(/#(.*)(?)/g, ($, $1) => {
-    //   return $1
-    // })
-    // console.log('hash***', a)
-    this.setState({ routeKey: hash.slice(1) })
+    let string = hash.split('?')[0]
+    console.log('hash***', string)
+    this.setState({ routeKey: string.slice(1) })
   }
   // 设置menu菜单高亮
   setKey(routeKey) {
