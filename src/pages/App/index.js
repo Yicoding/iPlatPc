@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { setUserInfo } from '../../redux/actions'
 import Store from '../../common/js/storage'
+import { getQueryString } from '../../common/js/tools'
 
 import {
   Icon,
@@ -40,14 +41,30 @@ class App extends Component {
       }
     }
     console.log('userInfo', userInfo)
-    let { hash } = window.location
-    let string = hash.split('?')[1]
-    console.log('string**', string)
-    if (string) {
+    // 是否为root登陆
+    let root = window.sessionStorage.getItem('root');
+    if (Object.prototype.toString.call(root) === '[object Null]') {
+      root = getQueryString('root');
+      if (root === 'true') {
+        window.sessionStorage.setItem('root', 'true')
+      }
+    }
+    console.log('sessionRoot:', root)
+    if (root === 'true') {
       this.setState({ role: 'admin' })
     } else {
       this.setState({ role: userInfo.role_name })
     }
+    // 判断是否是root查看某个公司的信息
+    setTimeout(() => {
+      console.log('this.props.params', this.props.history)
+    }, 3000)
+    // if (Object.prototype.toString.call(company_id) === '[object Null]') {
+    //   company_id = getQueryString('company_id');
+    //   if (company_id) {
+    //     window.sessionStorage.setItem('company_id', company_id)
+    //   }
+    // }
   }
   // 收起展开菜单
   toggle = () => {

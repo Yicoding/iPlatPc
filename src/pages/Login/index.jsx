@@ -50,7 +50,11 @@ class Login extends Component {
         this.userInfoStore.set(data)        
         // 跳转到主页
         setTimeout(() => {
-          this.props.history.replace('/app/goods')
+          if (data.role_id !== 1) {
+            this.props.history.replace('/app/goods/' + data.company_id)
+          } else {
+            this.props.history.replace('/app/goods')
+          }
         }, 1000)
       } else {
         message.error(data);

@@ -6,6 +6,7 @@ import {
 } from 'antd';
 
 import config from '../../routes/config';
+import { getQueryString } from '../../common/js/tools'
 
 const { Sider } = Layout;
 
@@ -32,6 +33,20 @@ export default class SlideMenu extends Component {
   _renderList = role => {
     if (role) {
       let routeList = config[role]
+      console.log('routeList', routeList)
+      // 判断是否是root查看某个公司的信息
+      let company_id = window.sessionStorage.getItem('company_id');
+      if (Object.prototype.toString.call(company_id) === '[object Null]') {
+        company_id = getQueryString('company_id');
+        if (company_id) {
+          window.sessionStorage.setItem('company_id', company_id)
+        }
+      }
+      if (company_id) {
+        routeList.forEach(item => {
+          item.route = item.route.split(':')[0] + company_id
+        })
+      }
       return (
         routeList && routeList.length > 0 && routeList.map(item => {
           return (

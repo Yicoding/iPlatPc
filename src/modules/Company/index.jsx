@@ -17,7 +17,7 @@ import { api } from '../../api/index.js'
 class Company extends Component {
   columns = [
     { title: 'id', dataIndex: 'id', key: 'id', align: 'center' },
-    { title: '公司名称', dataIndex: 'name', key: 'name', align: 'center' },
+    { title: '公司名称', dataIndex: 'name', key: 'name', align: 'center', render: (text, record) => <Button onClick={() => this.jumpCompany(record)} type="link">{text}</Button> },
     { title: '创建时间', dataIndex: 'createTime', key: 'createTime', align: 'center' },
     { title: '操作', key: 'edit', align: 'center', render: (text) => (
       <div>
@@ -49,6 +49,10 @@ class Company extends Component {
     } catch(e) {
       console.log('getCompanyList报错', e)
     }
+  }
+  // 打开新窗口，查看公司详情
+  jumpCompany = item => {
+    window.open(`${window.location.origin}/#/app/goods?root=true&company_id=${item.id}`)
   }
   // 新增按钮
   add = () => {

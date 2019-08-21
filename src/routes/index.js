@@ -5,7 +5,7 @@ import AllComponents from '../modules';
 import config from './config';
 
 export default class RouteConfig extends Component {
-  // 渲染初始化路由
+  // 渲染初始化路由 /app时
   _renderInitRoute = role => {
     if (role && config[role] && config[role].length > 0) {
       const Component = AllComponents[config[role][0].component]
