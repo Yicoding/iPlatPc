@@ -15,7 +15,7 @@ import {
 import { connect } from 'react-redux';
 import { api } from '../../api/index.js'
 
-class User extends Component {
+class Goods extends Component {
   columns = [
     { title: 'id', dataIndex: 'id', key: 'id', align: 'center' },
     { title: '用户名', dataIndex: 'name', key: 'name', align: 'center' },
@@ -51,6 +51,9 @@ class User extends Component {
     this.getUserList()
     this.getCompanyList()
     this.getRoleList()
+    setTimeout(() => {
+      console.log('当前路由：', this.props.history)
+    }, 3000)
   }
   // 获取用户列表
   async getUserList() {
@@ -329,7 +332,7 @@ class User extends Component {
   }
 }
 
-const WrappedHorizontalLoginForm = Form.create({ name: 'User' })(User)
+const WrappedHorizontalLoginForm = Form.create({ name: 'Goods' })(Goods)
 
 const mapStateToProps = function(store) {
   return {

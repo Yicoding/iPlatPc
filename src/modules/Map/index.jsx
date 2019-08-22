@@ -15,7 +15,7 @@ import {
 import { connect } from 'react-redux';
 import { api } from '../../api/index.js'
 
-class Role extends Component {
+class Map extends Component {
   columns = [
     { title: 'id', dataIndex: 'id', key: 'id', align: 'center' },
     { title: '类型名称', dataIndex: 'name', key: 'name', align: 'center' },
@@ -239,7 +239,7 @@ class Role extends Component {
   }
 }
 
-const WrappedHorizontalLoginForm = Form.create({ name: 'Role' })(Role)
+const WrappedHorizontalLoginForm = Form.create({ name: 'Map' })(Map)
 
 const mapStateToProps = function(store) {
   return {
