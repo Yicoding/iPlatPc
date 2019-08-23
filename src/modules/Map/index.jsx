@@ -51,7 +51,7 @@ class Map extends Component {
       const { userInfo } = this.props
       let { data } = await api.getGoodsTypeList({
         role_id: userInfo.role_id,
-        company_id: userInfo.company_id
+        company_id: this.props.company_id || null
       })
       console.log(data)
       this.setState({ dataList: data })
@@ -75,10 +75,10 @@ class Map extends Component {
   add = () => {
     console.log('add');
     this.type = 'add'
-    let { form } = this.props
+    let { form, userInfo } = this.props
     form.setFieldsValue({
       name: '',
-      company_id: ''
+      company_id: userInfo.role_name === 'admin' ? userInfo.company_id : ''
     });
     this.setState({
       title: '新增类型',
@@ -135,13 +135,17 @@ class Map extends Component {
   // 确定按钮
   handleOk = () => {
     let { validateFields } = this.props.form
+    const { userInfo } = this.props
     validateFields(async(err, values) => {
       if (err) {
         return console.log('handleOkError', err)
       }
       console.log('form', values)
+      if (userInfo.role_name === 'admin') {
+        values.company_id = userInfo.company_id
+      }
       let index = this.options.findIndex(item => item.id === values.company_id)
-      let companyName = this.options[index].name
+      let companyName = userInfo.role_name === 'root' ? this.options[index].name : userInfo.companyName
       try {
         this.setState({ confirmLoading: true })
         let info = '创建成功，类型家族又添新同胞啦'
@@ -188,20 +192,40 @@ class Map extends Component {
   handleCancel = () => {
     this.setState({ visible: false })
   }
+  // 渲染弹窗中的公司选择器
+  _renderFormCompany = role_name => {
+    const { getFieldDecorator } = this.props.form;
+    const { children } = this
+    if (role_name === 'root') {
+      return (
+        <Form.Item label="所属公司">
+          {getFieldDecorator('company_id', {
+            rules: [{ required: true, message: '请选择所属公司' }]
+          })(<Select
+            notFoundContent="暂未找到"
+            placeholder="请选择所属公司" >
+            {children}
+          </Select>)}
+        </Form.Item>
+      )
+    }
+    return null
+  }
   render() {
-    let {
+    const {
       add,
       columns,
       children,
       handleOk,
       handleCancel
     } = this
-    let {
+    const {
       dataList,
       title,
       visible,
       confirmLoading
     } = this.state
+    const { userInfo } = this.props
     const { getFieldDecorator } = this.props.form;
     return (
       <div>
@@ -223,15 +247,8 @@ class Map extends Component {
                   rules: [{ required: true, whitespace: true, message: '请输入类型名称' }]
                 })(<Input className="form-input" placeholder="请输入类型名称" />)}
               </Form.Item>
-              <Form.Item label="所属公司">
-                {getFieldDecorator('company_id', {
-                  rules: [{ required: true, message: '请选择所属公司' }]
-                })(<Select
-                  notFoundContent="暂未找到"
-                  placeholder="请选择所属公司" >
-                  {children}
-                </Select>)}
-              </Form.Item>
+              {this._renderFormCompany(userInfo.role_name)}
+              
             </Form>
         </Modal>
       </div>
@@ -243,7 +260,8 @@ const WrappedHorizontalLoginForm = Form.create({ name: 'Map' })(Map)
 
 const mapStateToProps = function(store) {
   return {
-    userInfo: store.userInfo
+    userInfo: store.userInfo,
+    company_id: store.company_id
   };
 };
 

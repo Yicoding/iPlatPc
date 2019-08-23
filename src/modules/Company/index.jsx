@@ -52,7 +52,7 @@ class Company extends Component {
   }
   // 打开新窗口，查看公司详情
   jumpCompany = item => {
-    window.open(`${window.location.origin}/#/app/goods?root=true&company_id=${item.id}`)
+    window.open(`${window.location.origin}?company_id=${item.id}#/app/goods`)
   }
   // 新增按钮
   add = () => {

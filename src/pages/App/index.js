@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { setUserInfo } from '../../redux/actions'
+import { setUserInfo, setCompanyId } from '../../redux/actions'
 import Store from '../../common/js/storage'
-import { getQueryString } from '../../common/js/tools'
 
 import {
   Icon,
@@ -41,30 +40,26 @@ class App extends Component {
       }
     }
     console.log('userInfo', userInfo)
-    // 是否为root登陆
-    let root = window.sessionStorage.getItem('root');
-    if (Object.prototype.toString.call(root) === '[object Null]') {
-      root = getQueryString('root');
-      if (root === 'true') {
-        window.sessionStorage.setItem('root', 'true')
-      }
+    // 是否只查看某个公司
+    let single = false;
+    let params = new URLSearchParams(window.location.search);
+    let company_id = params.get('company_id');
+    console.log('company_id****', company_id);
+    if (userInfo.role_name === 'admin') {
+      single = true
+      const { setCompany } = this.props;
+      setCompany(userInfo.company_id);
     }
-    console.log('sessionRoot:', root)
-    if (root === 'true') {
+    if (company_id) { // root查看
+      single = true
+      const { setCompany } = this.props;
+      setCompany(company_id);
+    }
+    if (single) {
       this.setState({ role: 'admin' })
     } else {
       this.setState({ role: userInfo.role_name })
     }
-    // 判断是否是root查看某个公司的信息
-    setTimeout(() => {
-      console.log('this.props.params', this.props.history)
-    }, 3000)
-    // if (Object.prototype.toString.call(company_id) === '[object Null]') {
-    //   company_id = getQueryString('company_id');
-    //   if (company_id) {
-    //     window.sessionStorage.setItem('company_id', company_id)
-    //   }
-    // }
   }
   // 收起展开菜单
   toggle = () => {
@@ -103,7 +98,8 @@ class App extends Component {
 
 const mapStateToProps = function(store) {
   return {
-    userInfo: store.userInfo
+    userInfo: store.userInfo,
+    company_id: store.company_id
   };
 };
 
@@ -111,6 +107,9 @@ const mapDispatchToProps = function(dispatch, ownProps) {
   return {
     loginOk: (data) => {
       dispatch(setUserInfo(data))
+    },
+    setCompany: (id) => {
+      dispatch(setCompanyId(id))
     }
   };
 };

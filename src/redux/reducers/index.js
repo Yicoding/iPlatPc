@@ -1,10 +1,10 @@
 import { combineReducers } from 'redux'
 import userInfo from './userInfo'
-import companyId from './companyId'
+import company_id from './companyId'
 
 const todoApp = combineReducers({
     userInfo,
-    companyId
+    company_id
 })
 
 export default todoApp

@@ -49,13 +49,7 @@ class Login extends Component {
         // 存到本地
         this.userInfoStore.set(data)        
         // 跳转到主页
-        setTimeout(() => {
-          if (data.role_id !== 1) {
-            this.props.history.replace('/app/goods/' + data.company_id)
-          } else {
-            this.props.history.replace('/app/goods')
-          }
-        }, 1000)
+        this.props.history.replace('/app/goods')
       } else {
         message.error(data);
       }

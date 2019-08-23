@@ -10,9 +10,9 @@ export const setUserInfo = userInfo => {
 }
 
 // 公司id
-export const setCompanyId = id => {
+export const setCompanyId = company_id => {
   return {
     type: 'SET_COMPANYID',
-    id
+    company_id
   }
 }
