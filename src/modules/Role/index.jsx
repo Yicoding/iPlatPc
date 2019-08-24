@@ -44,7 +44,7 @@ class Role extends Component {
   async getRoleList() {
     try {
       let { data } = await api.getRoleList({
-        all: true
+        role_name: 'root'
       })
       console.log(data)
       this.setState({ dataList: data })

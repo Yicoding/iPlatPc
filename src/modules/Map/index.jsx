@@ -48,10 +48,9 @@ class Map extends Component {
   // 获取类型列表
   async getGoodsTypeList() {
     try {
-      const { userInfo } = this.props
+      const { company_id } = this.props
       let { data } = await api.getGoodsTypeList({
-        role_id: userInfo.role_id,
-        company_id: this.props.company_id || null
+        company_id: company_id
       })
       console.log(data)
       this.setState({ dataList: data })
@@ -78,7 +77,7 @@ class Map extends Component {
     let { form, userInfo } = this.props
     form.setFieldsValue({
       name: '',
-      company_id: userInfo.role_name === 'admin' ? userInfo.company_id : ''
+      company_id: userInfo.role_name === 'root' ? null : userInfo.company_id
     });
     this.setState({
       title: '新增类型',
@@ -215,7 +214,6 @@ class Map extends Component {
     const {
       add,
       columns,
-      children,
       handleOk,
       handleCancel
     } = this
@@ -248,7 +246,6 @@ class Map extends Component {
                 })(<Input className="form-input" placeholder="请输入类型名称" />)}
               </Form.Item>
               {this._renderFormCompany(userInfo.role_name)}
-              
             </Form>
         </Modal>
       </div>

@@ -1,4 +1,4 @@
-const company_id = (state = 0, action) => {
+const company_id = (state = null, action) => {
   const { type, company_id } = action
   switch (type) {
     case 'SET_COMPANYID':
