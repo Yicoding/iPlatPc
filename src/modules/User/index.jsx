@@ -57,7 +57,7 @@ class User extends Component {
     try {
       const { userInfo, company_id } = this.props
       let { data } = await api.getUserList({
-        role_name: userInfo.role_name,
+        role_name: company_id ? 'admin' : 'root',
         company_id: company_id
       })
       console.log(data)
