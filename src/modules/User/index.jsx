@@ -48,16 +48,18 @@ class User extends Component {
     }
   }
   componentDidMount() {
+    const { company_id } = this.props
     this.getUserList()
-    this.getCompanyList()
     this.getRoleList()
+    if (!company_id) {
+      this.getCompanyList()
+    }
   }
   // 获取用户列表
   async getUserList() {
     try {
-      const { userInfo, company_id } = this.props
+      const { company_id } = this.props
       let { data } = await api.getUserList({
-        role_name: company_id ? 'admin' : 'root',
         company_id: company_id
       })
       console.log(data)
@@ -82,9 +84,9 @@ class User extends Component {
   async getRoleList() {
     const { Option } = Select;
     try {
-      const { userInfo } = this.props
+      const { company_id } = this.props
       let value = {
-        role_name: userInfo.role_name
+        company_id
       }
       let { data } = await api.getRoleList(value)
       console.log(data)
@@ -98,13 +100,13 @@ class User extends Component {
   add = () => {
     console.log('add');
     this.type = 'add'
-    let { form, userInfo } = this.props
+    let { form, userInfo, company_id } = this.props
     form.setFieldsValue({
       name: '',
       phone: '',
       password: '',
       age: '',
-      company_id: userInfo.role_name === 'root' ? null : userInfo.company_id,
+      company_id: !company_id ? null : userInfo.company_id,
       role_id: '',
       sign: '',
       avatar: ''
@@ -170,17 +172,17 @@ class User extends Component {
   // 确定按钮
   handleOk = () => {
     let { validateFields } = this.props.form
-    const { userInfo } = this.props
+    const { userInfo, company_id } = this.props
     validateFields(async(err, values) => {
       if (err) {
         return console.log('handleOkError', err)
       }
       console.log('form', values);
-      if (userInfo.role_name === 'admin') {
+      if (company_id) {
         values.company_id = userInfo.company_id
       }
       let index = this.options.findIndex(item => item.id === values.company_id)
-      let companyName = userInfo.role_name === 'root' ? this.options[index].name : userInfo.companyName
+      let companyName = !company_id ? this.options[index].name : userInfo.companyName
       let roleIndex = this.optionsRole.findIndex(item => item.id === values.role_id)
       let role_fullName = this.optionsRole[roleIndex].fullName
       try {
@@ -248,7 +250,8 @@ class User extends Component {
   _renderFormCompany = role_name => {
     const { getFieldDecorator } = this.props.form;
     const { children } = this
-    if (role_name === 'root') {
+    const { company_id } = this.props
+    if (!company_id) {
       return (
         <Form.Item label="所属公司">
           {getFieldDecorator('company_id', {

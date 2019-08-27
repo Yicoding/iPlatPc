@@ -42,8 +42,11 @@ class Map extends Component {
     }
   }
   componentDidMount() {
+    const { company_id } = this.props
     this.getGoodsTypeList()
-    this.getCompanyList()
+    if (!company_id) {
+      this.getCompanyList()
+    }
   }
   // 获取类型列表
   async getGoodsTypeList() {
@@ -74,15 +77,15 @@ class Map extends Component {
   add = () => {
     console.log('add');
     this.type = 'add'
-    let { form, userInfo } = this.props
-    form.setFieldsValue({
-      name: '',
-      company_id: userInfo.role_name === 'root' ? null : userInfo.company_id
-    });
+    let { form, userInfo, company_id } = this.props
     this.setState({
       title: '新增类型',
       visible: true
     })
+    form.setFieldsValue({
+      name: '',
+      company_id: !company_id ? null : userInfo.company_id
+    });
   }
   // 编辑按钮
   edit = (text) => {
@@ -90,14 +93,14 @@ class Map extends Component {
     this.type = 'edit'
     this.id = text.id
     let { form } = this.props
-    form.setFieldsValue({
-      name: text.name,
-      company_id: text.company_id
-    });
     this.setState({
       title: '编辑类型',
       visible: true
     })
+    form.setFieldsValue({
+      name: text.name,
+      company_id: text.company_id
+    });
   }
   // 删除按钮
   remove = (text) => {
@@ -134,17 +137,17 @@ class Map extends Component {
   // 确定按钮
   handleOk = () => {
     let { validateFields } = this.props.form
-    const { userInfo } = this.props
+    const { userInfo, company_id } = this.props
     validateFields(async(err, values) => {
       if (err) {
         return console.log('handleOkError', err)
       }
       console.log('form', values)
-      if (userInfo.role_name === 'admin') {
+      if (company_id) {
         values.company_id = userInfo.company_id
       }
       let index = this.options.findIndex(item => item.id === values.company_id)
-      let companyName = userInfo.role_name === 'root' ? this.options[index].name : userInfo.companyName
+      let companyName = !company_id ? this.options[index].name : userInfo.companyName
       try {
         this.setState({ confirmLoading: true })
         let info = '创建成功，类型家族又添新同胞啦'
@@ -195,7 +198,8 @@ class Map extends Component {
   _renderFormCompany = role_name => {
     const { getFieldDecorator } = this.props.form;
     const { children } = this
-    if (role_name === 'root') {
+    const { company_id } = this.props
+    if (!company_id) {
       return (
         <Form.Item label="所属公司">
           {getFieldDecorator('company_id', {

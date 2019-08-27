@@ -43,9 +43,7 @@ class Role extends Component {
   // 获取角色列表
   async getRoleList() {
     try {
-      let { data } = await api.getRoleList({
-        role_name: 'root'
-      })
+      let { data } = await api.getRoleList()
       console.log(data)
       this.setState({ dataList: data })
     } catch(e) {

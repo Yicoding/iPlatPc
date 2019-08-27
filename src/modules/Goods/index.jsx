@@ -48,21 +48,20 @@ class Goods extends Component {
     }
   }
   componentDidMount() {
+    const { company_id } = this.props
     this.getUserList()
-    this.getCompanyList()
     this.getRoleList()
-    setTimeout(() => {
-      console.log('当前路由：', this.props.history)
-    }, 3000)
+    if (!company_id) {
+      this.getCompanyList()
+    }
   }
   // 获取用户列表
   async getUserList() {
     try {
-      const { userInfo } = this.props
+      const { company_id } = this.props
       let { data } = await api.getUserList({
-        id: userInfo.id,
-        role_id: userInfo.role_id,
-        company_id: userInfo.company_id
+        role_name: company_id ? 'admin' : 'root',
+        company_id: company_id
       })
       console.log(data)
       this.setState({ dataList: data })
@@ -86,10 +85,9 @@ class Goods extends Component {
   async getRoleList() {
     const { Option } = Select;
     try {
-      const { userInfo } = this.props
-      let value = {}
-      if (userInfo.id == 1) { // 系统管理员
-        value = { all: true }
+      const { company_id } = this.props
+      let value = {
+        company_id
       }
       let { data } = await api.getRoleList(value)
       console.log(data)
@@ -103,13 +101,13 @@ class Goods extends Component {
   add = () => {
     console.log('add');
     this.type = 'add'
-    let { form } = this.props
+    let { form, userInfo, company_id } = this.props
     form.setFieldsValue({
       name: '',
       phone: '',
       password: '',
       age: '',
-      company_id: '',
+      company_id: !company_id ? null : userInfo.company_id,
       role_id: '',
       sign: '',
       avatar: ''
@@ -175,15 +173,18 @@ class Goods extends Component {
   // 确定按钮
   handleOk = () => {
     let { validateFields } = this.props.form
+    const { userInfo, company_id } = this.props
     validateFields(async(err, values) => {
       if (err) {
         return console.log('handleOkError', err)
       }
       console.log('form', values);
+      if (company_id) {
+        values.company_id = userInfo.company_id
+      }
       let index = this.options.findIndex(item => item.id === values.company_id)
-      let companyName = this.options[index].name
+      let companyName = !company_id ? this.options[index].name : userInfo.companyName
       let roleIndex = this.optionsRole.findIndex(item => item.id === values.role_id)
-      // return console.log('roleIndex:', index, this.options, companyName,  this.optionsRole, roleIndex)
       let role_fullName = this.optionsRole[roleIndex].fullName
       try {
         this.setState({ confirmLoading: true })
@@ -246,21 +247,41 @@ class Goods extends Component {
   handleCancel = () => {
     this.setState({ visible: false })
   }
+  // 渲染弹窗中的公司选择器
+  _renderFormCompany = role_name => {
+    const { getFieldDecorator } = this.props.form;
+    const { children } = this
+    const { company_id } = this.props
+    if (!company_id) {
+      return (
+        <Form.Item label="所属公司">
+          {getFieldDecorator('company_id', {
+            rules: [{ required: true, message: '请选择所属公司' }]
+          })(<Select
+            notFoundContent="暂未找到"
+            placeholder="请选择所属公司" >
+            {children}
+          </Select>)}
+        </Form.Item>
+      )
+    }
+    return null
+  }
   render() {
-    let {
+    const {
       add,
       columns,
-      children,
       roles,
       handleOk,
       handleCancel
     } = this
-    let {
+    const {
       dataList,
       title,
       visible,
       confirmLoading
     } = this.state
+    const { userInfo } = this.props
     const { getFieldDecorator } = this.props.form;
     return (
       <div>
@@ -297,7 +318,7 @@ class Goods extends Component {
                   rules: [{ message: '请输入年龄' }]
                 })(<Input className="form-input" placeholder="请输入年龄" />)}
               </Form.Item>
-              <Form.Item label="所属公司">
+              {/* <Form.Item label="所属公司">
                 {getFieldDecorator('company_id', {
                   rules: [{ required: true, message: '请选择所属公司' }]
                 })(<Select
@@ -305,7 +326,8 @@ class Goods extends Component {
                   placeholder="请选择所属公司" >
                   {children}
                 </Select>)}
-              </Form.Item>
+              </Form.Item> */}
+              {this._renderFormCompany(userInfo.role_name)}
               <Form.Item label="角色">
                 {getFieldDecorator('role_id', {
                   rules: [{ required: true, message: '请选择所属角色' }]
@@ -336,7 +358,8 @@ const WrappedHorizontalLoginForm = Form.create({ name: 'Goods' })(Goods)
 
 const mapStateToProps = function(store) {
   return {
-    userInfo: store.userInfo
+    userInfo: store.userInfo,
+    company_id: store.company_id
   };
 };
 
