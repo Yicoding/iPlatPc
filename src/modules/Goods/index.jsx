@@ -18,7 +18,7 @@ import { api } from '../../api/index.js'
 class Goods extends Component {
   columns = [
     { title: 'id', dataIndex: 'id', key: 'id', align: 'center' },
-    { title: '用户名', dataIndex: 'name', key: 'name', align: 'center' },
+    { title: '商品名', dataIndex: 'name', key: 'name', align: 'center' },
     { title: '手机号', dataIndex: 'phone', key: 'phone', align: 'center' },
     { title: '密码', dataIndex: 'password', key: 'password', align: 'center' },
     { title: '年龄', dataIndex: 'age', key: 'age', align: 'center' },
@@ -49,24 +49,23 @@ class Goods extends Component {
   }
   componentDidMount() {
     const { company_id } = this.props
-    this.getUserList()
+    this.getGoodsList()
     this.getRoleList()
     if (!company_id) {
       this.getCompanyList()
     }
   }
-  // 获取用户列表
-  async getUserList() {
+  // 获取商品列表
+  async getGoodsList() {
     try {
       const { company_id } = this.props
-      let { data } = await api.getUserList({
-        role_name: company_id ? 'admin' : 'root',
+      let { data } = await api.getGoodsList({
         company_id: company_id
       })
       console.log(data)
       this.setState({ dataList: data })
     } catch(e) {
-      console.log('getUserList', e)
+      console.log('getGoodsList', e)
     }
   }
   // 获取公司列表
@@ -113,7 +112,7 @@ class Goods extends Component {
       avatar: ''
     });
     this.setState({
-      title: '新增用户',
+      title: '新增商品',
       visible: true
     })
   }
@@ -134,7 +133,7 @@ class Goods extends Component {
       avatar: text.avatar
     });
     this.setState({
-      title: '编辑用户',
+      title: '编辑商品',
       visible: true
     })
   }
@@ -188,7 +187,7 @@ class Goods extends Component {
       let role_fullName = this.optionsRole[roleIndex].fullName
       try {
         this.setState({ confirmLoading: true })
-        let info = '创建成功，用户家族又添新同胞啦'
+        let info = '创建成功，商品家族又添新同胞啦'
         let dataList = this.state.dataList
         if (this.type === 'add') { // 新增
           let { data } = await api.addUser(values)
@@ -298,10 +297,10 @@ class Goods extends Component {
           onCancel={handleCancel} 
           cancelText="取消" >
             <Form>
-              <Form.Item label="用户名">
+              <Form.Item label="商品名">
                 {getFieldDecorator('name', {
-                  rules: [{ required: true, whitespace: true, message: '请输入用户名称' }]
-                })(<Input className="form-input" placeholder="请输入用户名称" />)}
+                  rules: [{ required: true, whitespace: true, message: '请输入商品名称' }]
+                })(<Input className="form-input" placeholder="请输入商品名称" />)}
               </Form.Item>
               <Form.Item label="手机号">
                 {getFieldDecorator('phone', {
