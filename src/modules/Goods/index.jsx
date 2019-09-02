@@ -9,23 +9,42 @@ import {
   Form,
   Input,
   message,
-  Select
+  Select,
+  Tag
 } from 'antd';
 
 import { connect } from 'react-redux';
 import { api } from '../../api/index.js'
 
+const colorArr = ['green', 'cyan', 'purple', 'geekblue', 'blue']
+
 class Goods extends Component {
   columns = [
-    { title: 'id', dataIndex: 'id', key: 'id', align: 'center' },
-    { title: '商品名', dataIndex: 'name', key: 'name', align: 'center' },
-    { title: '手机号', dataIndex: 'phone', key: 'phone', align: 'center' },
-    { title: '密码', dataIndex: 'password', key: 'password', align: 'center' },
-    { title: '年龄', dataIndex: 'age', key: 'age', align: 'center' },
+    { title: 'id', dataIndex: 'id', key: 'id', align: 'center', fixed: 'left' },
+    { title: '商品名', dataIndex: 'name', key: 'name', align: 'center', fixed: 'left' },
+    { title: '单价单位', dataIndex: 'unitOne.name', key: 'unitOne.name', align: 'center' },
+    { title: '总单位', dataIndex: 'unitDouble.name', key: 'unitDouble.name', align: 'center' },
+    { title: '进货单价', dataIndex: 'buySingle', key: 'buySingle', align: 'center' },
+    { title: '进货总价', dataIndex: 'buyAll', key: 'buyAll', align: 'center' },
+    { title: '批发单价', dataIndex: 'midSingle', key: 'midSingle', align: 'center' },
+    { title: '批发总价', dataIndex: 'midAll', key: 'midAll', align: 'center' },
+    { title: '零售单价', dataIndex: 'sellSingle', key: 'sellSingle', align: 'center' },
+    { title: '零售总价', dataIndex: 'sellAll', key: 'sellAll', align: 'center' },
+    { title: '商品数量', dataIndex: 'num', key: 'num', align: 'center' },
+    { title: '商品描述', dataIndex: 'desc', key: 'desc', align: 'center' },
+    { title: '商品来源', dataIndex: 'origin', key: 'origin', align: 'center' },
     { title: '所属公司', dataIndex: 'companyName', key: 'companyName', align: 'center' },
-    { title: '角色', dataIndex: 'role_fullName', key: 'role_fullName', align: 'center' },
-    { title: '个性签名', dataIndex: 'sign', key: 'sign', align: 'center' },
-    { title: '操作', key: 'edit', align: 'center', render: (text) => (
+    { title: '商品类别', key: 'typeName', align: 'center', width: 150, render: (text) => (
+      <div>
+        {
+          text.typeName.map((item, index) => {
+            return <Tag key={index} color={colorArr[index]}>{item.name}</Tag>
+          })
+        }
+      </div>
+    ) },
+    { title: '商品图片', dataIndex: 'coverImg', key: 'coverImg', align: 'center' },
+    { title: '操作', key: 'edit', align: 'center', fixed: 'right', render: (text) => (
       <div>
         <Button className="right-space" icon="edit" onClick={() => this.edit(text)}>编辑</Button>
         <Button type="danger" icon="delete" onClick={() => this.remove(text)}>删除</Button>
@@ -287,7 +306,7 @@ class Goods extends Component {
         <div className="table-filter-box">
           <Button type="primary" icon="plus" onClick={add}>添加</Button>
         </div>
-        <Table columns={columns} dataSource={dataList} rowKey="id" />
+        <Table columns={columns} dataSource={dataList} rowKey="id" scroll={{ x: 1300 }} />
         <Modal
           title={title}
           visible={visible}

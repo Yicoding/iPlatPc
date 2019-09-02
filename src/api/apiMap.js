@@ -24,6 +24,12 @@ let apiMap = {
   addUser: ['POST', '/addUser'], // 新增用户
   updateUser: ['PUT', '/updateUser'], // 更新单个用户
   removeUser: ['DELETE', '/removeUser'], // 删除单个用户
+  // 商品
+  getGoodsList: ['GET', '/getGoodsList'], // 查看商品列表
+  getGoodsDetail: ['GET', '/getGoodsDetail'], // 查看单个商品详情
+  addGoods: ['POST', '/addGoods'], // 新增商品
+  updateGoods: ['PUT', '/updateGoods'], // 更新单个商品
+  removeGoods: ['DELETE', '/removeGoods'], // 删除单个商品
 }
 
 export default apiMap
