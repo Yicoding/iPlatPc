@@ -30,6 +30,12 @@ let apiMap = {
   addGoods: ['POST', '/addGoods'], // 新增商品
   updateGoods: ['PUT', '/updateGoods'], // 更新单个商品
   removeGoods: ['DELETE', '/removeGoods'], // 删除单个商品
+  // 单位
+  getUnitList: ['GET', '/getUnitList'], // 查看单位列表
+  getUnitDetail: ['GET', '/getUnitDetail'], // 查看单个单位详情
+  addUnit: ['POST', '/addUnit'], // 新增单位
+  updateUnit: ['PUT', '/updateUnit'], // 更新单个单位
+  removeUnit: ['DELETE', '/removeUnit'], // 删除单个单位
 }
 
 export default apiMap

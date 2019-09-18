@@ -22,19 +22,19 @@ class Goods extends Component {
   columns = [
     { title: 'id', dataIndex: 'id', key: 'id', align: 'center', fixed: 'left' },
     { title: '商品名', dataIndex: 'name', key: 'name', align: 'center', fixed: 'left' },
+    { title: '所属公司', dataIndex: 'companyName', key: 'companyName', align: 'center' },
     { title: '单价单位', dataIndex: 'unitOne.name', key: 'unitOne.name', align: 'center' },
     { title: '总单位', dataIndex: 'unitDouble.name', key: 'unitDouble.name', align: 'center' },
-    { title: '进货单价', dataIndex: 'buySingle', key: 'buySingle', align: 'center' },
-    { title: '进货总价', dataIndex: 'buyAll', key: 'buyAll', align: 'center' },
-    { title: '批发单价', dataIndex: 'midSingle', key: 'midSingle', align: 'center' },
-    { title: '批发总价', dataIndex: 'midAll', key: 'midAll', align: 'center' },
-    { title: '零售单价', dataIndex: 'sellSingle', key: 'sellSingle', align: 'center' },
-    { title: '零售总价', dataIndex: 'sellAll', key: 'sellAll', align: 'center' },
+    { title: '进货单价(元)', dataIndex: 'buySingle', key: 'buySingle', align: 'center' },
+    { title: '进货总价(元)', dataIndex: 'buyAll', key: 'buyAll', align: 'center' },
+    { title: '批发单价(元)', dataIndex: 'midSingle', key: 'midSingle', align: 'center' },
+    { title: '批发总价(元)', dataIndex: 'midAll', key: 'midAll', align: 'center' },
+    { title: '零售单价(元)', dataIndex: 'sellSingle', key: 'sellSingle', align: 'center' },
+    { title: '零售总价(元)', dataIndex: 'sellAll', key: 'sellAll', align: 'center' },
     { title: '商品数量', dataIndex: 'num', key: 'num', align: 'center' },
     { title: '商品描述', dataIndex: 'desc', key: 'desc', align: 'center' },
     { title: '商品来源', dataIndex: 'origin', key: 'origin', align: 'center' },
-    { title: '所属公司', dataIndex: 'companyName', key: 'companyName', align: 'center' },
-    { title: '商品类别', key: 'typeName', align: 'center', width: 150, render: (text) => (
+    { title: '商品类别', key: 'typeName', align: 'center', width: 200, render: (text) => (
       <div>
         {
           text.typeName.map((item, index) => {
@@ -43,7 +43,7 @@ class Goods extends Component {
         }
       </div>
     ) },
-    { title: '商品图片', dataIndex: 'coverImg', key: 'coverImg', align: 'center' },
+    { title: '商品图片', dataIndex: 'coverImg', key: 'coverImg', align: 'center', width: 150 },
     { title: '操作', key: 'edit', align: 'center', fixed: 'right', render: (text) => (
       <div>
         <Button className="right-space" icon="edit" onClick={() => this.edit(text)}>编辑</Button>
@@ -69,9 +69,11 @@ class Goods extends Component {
   componentDidMount() {
     const { company_id } = this.props
     this.getGoodsList()
-    this.getRoleList()
+    this.getGoodsTypeList()
     if (!company_id) {
       this.getCompanyList()
+    } else {
+      this.getUnitList()
     }
   }
   // 获取商品列表
@@ -99,22 +101,39 @@ class Goods extends Component {
       console.log('getCompanyList报错', e)
     }
   }
-  // 获取角色列表
-  async getRoleList() {
+  // 获取商品类型列表
+  async getGoodsTypeList() {
     const { Option } = Select;
     try {
       const { company_id } = this.props
       let value = {
         company_id
       }
-      let { data } = await api.getRoleList(value)
+      let { data } = await api.getGoodsTypeList(value)
       console.log(data)
       this.optionsRole = data
       this.roles = data.map(item => <Option key={item.id} value={item.id}>{item.fullName}</Option>)
     } catch(e) {
-      console.log('getRoleList', e)
+      console.log('getGoodsTypeList', e)
     }
   }
+  // 获取单位列表
+  async getUnitList() {
+    const { Option } = Select;
+    try {
+      const { company_id } = this.props
+      let value = {
+        company_id
+      }
+      let { data } = await api.getUnitList(value)
+      console.log(data)
+      this.optionsUnit = data
+      this.units = data.map(item => <Option key={item.id} value={item.id}>{item.name}</Option>)
+    } catch(e) {
+      console.log('getUnitList', e)
+    }
+  }
+
   // 新增按钮
   add = () => {
     console.log('add');
@@ -277,7 +296,9 @@ class Goods extends Component {
             rules: [{ required: true, message: '请选择所属公司' }]
           })(<Select
             notFoundContent="暂未找到"
-            placeholder="请选择所属公司" >
+            placeholder="请选择所属公司"
+            onChange={(val) => console.log('val**', val)}
+            >
             {children}
           </Select>)}
         </Form.Item>
@@ -306,7 +327,7 @@ class Goods extends Component {
         <div className="table-filter-box">
           <Button type="primary" icon="plus" onClick={add}>添加</Button>
         </div>
-        <Table columns={columns} dataSource={dataList} rowKey="id" scroll={{ x: 1300 }} />
+        <Table columns={columns} dataSource={dataList} rowKey="id" scroll={{ x: 1880 }} />
         <Modal
           title={title}
           visible={visible}
@@ -321,6 +342,7 @@ class Goods extends Component {
                   rules: [{ required: true, whitespace: true, message: '请输入商品名称' }]
                 })(<Input className="form-input" placeholder="请输入商品名称" />)}
               </Form.Item>
+              {this._renderFormCompany(userInfo.role_name)}
               <Form.Item label="手机号">
                 {getFieldDecorator('phone', {
                   rules: [{ required: true, whitespace: true, message: '请输入手机号' }]
@@ -336,22 +358,12 @@ class Goods extends Component {
                   rules: [{ message: '请输入年龄' }]
                 })(<Input className="form-input" placeholder="请输入年龄" />)}
               </Form.Item>
-              {/* <Form.Item label="所属公司">
-                {getFieldDecorator('company_id', {
-                  rules: [{ required: true, message: '请选择所属公司' }]
-                })(<Select
-                  notFoundContent="暂未找到"
-                  placeholder="请选择所属公司" >
-                  {children}
-                </Select>)}
-              </Form.Item> */}
-              {this._renderFormCompany(userInfo.role_name)}
-              <Form.Item label="角色">
+              <Form.Item label="商品类型">
                 {getFieldDecorator('role_id', {
-                  rules: [{ required: true, message: '请选择所属角色' }]
+                  rules: [{ required: true, message: '请选择所属商品类型' }]
                 })(<Select
                   notFoundContent="暂未找到"
-                  placeholder="请选择所属角色" >
+                  placeholder="请选择所属商品类型" >
                   {roles}
                 </Select>)}
               </Form.Item>
