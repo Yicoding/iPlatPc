@@ -48,12 +48,12 @@ function getUrlParams(variable) {
  */
 function getQueryString(name) {
     let reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
-    if(window.location.hash.indexOf("?") < 0){
-            return null;
+    if (window.location.hash.indexOf("?") < 0) {
+        return null;
     }
-    let r = window.location.hash.split("?")[1].match(reg); 　　
-    if (r != null) return decodeURIComponent(r[2]); 
-　　    return null; 
+    let r = window.location.hash.split("?")[1].match(reg);
+    if (r != null) return decodeURIComponent(r[2]);
+    return null;
 }
 
 

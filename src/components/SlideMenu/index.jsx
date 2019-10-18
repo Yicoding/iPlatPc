@@ -6,7 +6,6 @@ import {
 } from 'antd';
 
 import config from '../../routes/config';
-import { getQueryString } from '../../common/js/tools'
 
 const { Sider } = Layout;
 

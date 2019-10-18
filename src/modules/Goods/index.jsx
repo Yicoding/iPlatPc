@@ -1,5 +1,5 @@
 /**
- * company
+ * goods
  */
 import React, { Component } from 'react'
 import {
@@ -51,10 +51,14 @@ class Goods extends Component {
       </div>
     )},
   ]
-  children = []
-  roles = []
-  options = []
-  optionsRole = []
+  
+  dataCompanys = [] // 公司数据列表
+  optionCompanys = [] // 公司选择器列表
+  dataUnits = [] // 单位数据列表
+  // optionUints = [] // 单位选择器列表
+  dataTypes = [] // 商品类别数据列表
+  // optionTypes = [] // 商品类别选择器列表
+  
   type = ''
   id = 0
   constructor(props) {
@@ -63,17 +67,21 @@ class Goods extends Component {
       dataList: [],
       title: '',
       visible: false,
-      confirmLoading: false
+      confirmLoading: false,
+      showUnit: false,
+      optionUints: [], // 单位选择器列表
+      optionTypes: [] // 商品类别选择器列表
     }
   }
   componentDidMount() {
+    console.log('form------', this.props.form)
     const { company_id } = this.props
     this.getGoodsList()
-    this.getGoodsTypeList()
     if (!company_id) {
       this.getCompanyList()
     } else {
       this.getUnitList()
+      this.getGoodsTypeList()
     }
   }
   // 获取商品列表
@@ -95,40 +103,56 @@ class Goods extends Component {
     try {
       let { data } = await api.getCompanyList()
       console.log(data)
-      this.options = data
-      this.children = data.map(item => <Option key={item.id} value={item.id}>{item.name}</Option>)
+      this.dataCompanys = data
+      this.optionCompanys = data.map(item => <Option key={item.id} value={item.id}>{item.name}</Option>)
     } catch(e) {
       console.log('getCompanyList报错', e)
     }
   }
   // 获取商品类型列表
-  async getGoodsTypeList() {
+  async getGoodsTypeList(id=null, text=null) {
     const { Option } = Select;
     try {
       const { company_id } = this.props
       let value = {
-        company_id
+        company_id: id || company_id
       }
       let { data } = await api.getGoodsTypeList(value)
       console.log(data)
-      this.optionsRole = data
-      this.roles = data.map(item => <Option key={item.id} value={item.id}>{item.fullName}</Option>)
+      this.dataTypes = data
+      const optionTypes = data.map(item => <Option key={item.id} value={item.id}>{item.name}</Option>);
+      this.setState({ optionTypes });
+      if (text) {
+        const { form } = this.props;
+        form.setFieldsValue({
+          typeName: text.typeName.map(item => item.id)
+        });
+      }
     } catch(e) {
       console.log('getGoodsTypeList', e)
     }
   }
   // 获取单位列表
-  async getUnitList() {
+  async getUnitList(id=null, text=null) {
     const { Option } = Select;
     try {
       const { company_id } = this.props
       let value = {
-        company_id
+        company_id: id || company_id
       }
       let { data } = await api.getUnitList(value)
-      console.log(data)
-      this.optionsUnit = data
-      this.units = data.map(item => <Option key={item.id} value={item.id}>{item.name}</Option>)
+      this.dataUnits = data
+      console.log('getUnitList***', data)
+      const optionUints = data.map(item => <Option key={item.id} value={item.id}>{item.name}</Option>)
+      this.setState({ optionUints });
+      console.log('optionUints', optionUints)
+      if (text) {
+        const { form } = this.props
+        form.setFieldsValue({
+          unitOne_id: text.unitOne.id,
+          unitDouble_id: text.unitDouble.id,
+        });
+      }
     } catch(e) {
       console.log('getUnitList', e)
     }
@@ -138,42 +162,62 @@ class Goods extends Component {
   add = () => {
     console.log('add');
     this.type = 'add'
-    let { form, userInfo, company_id } = this.props
+    const { form, userInfo, company_id } = this.props
     form.setFieldsValue({
       name: '',
-      phone: '',
-      password: '',
-      age: '',
       company_id: !company_id ? null : userInfo.company_id,
-      role_id: '',
-      sign: '',
-      avatar: ''
+      unitOne_id: null,
+      unitDouble_id: null,
+      buySingle: '',
+      buyAll: '',
+      midSingle: '',
+      midAll: '',
+      sellSingle: '',
+      sellAll: '',
+      num: '',
+      desc: '',
+      origin: '',
+      typeName: []
     });
     this.setState({
       title: '新增商品',
-      visible: true
+      visible: true,
+      showUnit: false
     })
   }
   // 编辑按钮
   edit = (text) => {
     console.log(text);
+    console.log('text.typeName.map(item => item.id)', text.typeName.map(item => item.id));
     this.type = 'edit'
     this.id = text.id
-    let { form } = this.props
+    const { form, company_id } = this.props
     form.setFieldsValue({
       name: text.name,
-      phone: text.phone,
-      password: text.password,
-      age: text.age,
       company_id: text.company_id,
-      role_id: text.role_id,
-      sign: text.sign,
-      avatar: text.avatar
+      unitOne_id: text.unitOne.id,
+      unitDouble_id: text.unitDouble.id,
+      buySingle: text.buySingle,
+      buyAll: text.buyAll,
+      midSingle: text.midSingle,
+      midAll: text.midAll,
+      sellSingle: text.sellSingle,
+      sellAll: text.sellAll,
+      num: text.num,
+      desc: text.desc,
+      origin: text.origin,
+      typeName: text.typeName.map(item => item.id)
     });
     this.setState({
       title: '编辑商品',
-      visible: true
+      visible: true,
+      showUnit: true
     })
+    // root编辑时，需要根据公司查询该公司的单位列表
+    if (!company_id) {
+      this.getUnitList(text.company_id, text)
+      this.getGoodsTypeList(text.company_id, text)
+    }
   }
   // 删除按钮
   remove = (text) => {
@@ -198,9 +242,9 @@ class Goods extends Component {
       api.removeUser({
         id: text.id
       })
-      let index = this.state.dataList.findIndex(item => item.id === text.id)
+      const index = this.state.dataList.findIndex(item => item.id === text.id)
       message.success('删除成功');
-      let dataList = this.state.dataList
+      const dataList = this.state.dataList
       dataList.splice(index, 1)
       this.setState({ dataList })
     } catch(e) {
@@ -209,7 +253,7 @@ class Goods extends Component {
   }
   // 确定按钮
   handleOk = () => {
-    let { validateFields } = this.props.form
+    const { validateFields } = this.props.form
     const { userInfo, company_id } = this.props
     validateFields(async(err, values) => {
       if (err) {
@@ -219,10 +263,10 @@ class Goods extends Component {
       if (company_id) {
         values.company_id = userInfo.company_id
       }
-      let index = this.options.findIndex(item => item.id === values.company_id)
-      let companyName = !company_id ? this.options[index].name : userInfo.companyName
-      let roleIndex = this.optionsRole.findIndex(item => item.id === values.role_id)
-      let role_fullName = this.optionsRole[roleIndex].fullName
+      let index = this.dataCompanys.findIndex(item => item.id === values.company_id)
+      let companyName = !company_id ? this.dataCompanys[index].name : userInfo.companyName
+      let roleIndex = this.dataTypes.findIndex(item => item.id === values.role_id)
+      let role_fullName = this.dataTypes[roleIndex].fullName
       try {
         this.setState({ confirmLoading: true })
         let info = '创建成功，商品家族又添新同胞啦'
@@ -284,43 +328,43 @@ class Goods extends Component {
   handleCancel = () => {
     this.setState({ visible: false })
   }
-  // 渲染弹窗中的公司选择器
-  _renderFormCompany = role_name => {
-    const { getFieldDecorator } = this.props.form;
-    const { children } = this
-    const { company_id } = this.props
-    if (!company_id) {
-      return (
-        <Form.Item label="所属公司">
-          {getFieldDecorator('company_id', {
-            rules: [{ required: true, message: '请选择所属公司' }]
-          })(<Select
-            notFoundContent="暂未找到"
-            placeholder="请选择所属公司"
-            onChange={(val) => console.log('val**', val)}
-            >
-            {children}
-          </Select>)}
-        </Form.Item>
-      )
-    }
-    return null
+  // 选择公司时触发
+  companyHandle = val => {
+    console.log(val)
+    this.setState({
+      showUnit: true
+    })
+    this.getUnitList(val)
+    this.getGoodsTypeList(val)
+    const { form } = this.props
+    form.setFieldsValue({
+      unitOne_id: null,
+      unitDouble_id: null,
+      typeName: []
+    });
   }
+
   render() {
     const {
       add,
       columns,
-      roles,
+      optionCompanys,
+      // optionTypes,
+      // optionUints,
       handleOk,
-      handleCancel
+      handleCancel,
+      companyHandle
     } = this
     const {
       dataList,
       title,
       visible,
-      confirmLoading
+      showUnit,
+      confirmLoading,
+      optionUints,
+      optionTypes
     } = this.state
-    const { userInfo } = this.props
+    const { company_id } = this.props
     const { getFieldDecorator } = this.props.form;
     return (
       <div>
@@ -342,40 +386,105 @@ class Goods extends Component {
                   rules: [{ required: true, whitespace: true, message: '请输入商品名称' }]
                 })(<Input className="form-input" placeholder="请输入商品名称" />)}
               </Form.Item>
-              {this._renderFormCompany(userInfo.role_name)}
-              <Form.Item label="手机号">
-                {getFieldDecorator('phone', {
-                  rules: [{ required: true, whitespace: true, message: '请输入手机号' }]
-                })(<Input className="form-input" placeholder="请输入手机号" />)}
+              {
+                !company_id && (
+                  <Form.Item label="所属公司">
+                    {getFieldDecorator('company_id', {
+                      rules: [{ required: true, message: '请选择所属公司' }]
+                    })(<Select
+                      notFoundContent="暂未找到"
+                      placeholder="请选择所属公司"
+                      onChange={(val) => companyHandle(val)}
+                      >
+                      {optionCompanys}
+                    </Select>)}
+                  </Form.Item>
+                )
+              }
+              {
+                (showUnit || company_id) && (
+                  <Form.Item label="单价单位">
+                    {getFieldDecorator('unitOne_id', {
+                      rules: [{ required: true, message: '请选择单价单位' }]
+                    })(<Select
+                      notFoundContent="暂未找到"
+                      placeholder="请选择单价单位" >
+                      {optionUints}
+                    </Select>)}
+                  </Form.Item>
+                )
+              }
+              {
+                (showUnit || company_id) && (
+                  <Form.Item label="总单位">
+                    {getFieldDecorator('unitDouble_id', {
+                      rules: [{ required: true, message: '请选择总单位' }]
+                    })(<Select
+                      notFoundContent="暂未找到"
+                      placeholder="请选择总单位" >
+                      {optionUints}
+                    </Select>)}
+                  </Form.Item>
+                )
+              }
+              {
+                (showUnit || company_id) && (
+                  <Form.Item label="商品类别">
+                    {getFieldDecorator('typeName', {
+                      rules: [{ required: true, message: '请选择所属商品类别' }]
+                    })(<Select
+                      mode="multiple"
+                      notFoundContent="暂未找到"
+                      placeholder="请选择所属商品类别" >
+                      {optionTypes}
+                    </Select>)}
+                  </Form.Item>
+                )
+              }
+              <Form.Item label="进货单价">
+                {getFieldDecorator('buySingle', {
+                  rules: [{ required: true, whitespace: true, message: '请输入进货单价' }]
+                })(<Input className="form-input" placeholder="请输入进货单价" />)}
               </Form.Item>
-              <Form.Item label="密码">
-                {getFieldDecorator('password', {
-                  rules: [{ required: true, whitespace: true, message: '请输入密码' }]
-                })(<Input className="form-input" placeholder="请输入密码" />)}
+              <Form.Item label="进货总价">
+                {getFieldDecorator('buyAll', {
+                  rules: [{ required: true, whitespace: true, message: '请输入进货总价' }]
+                })(<Input className="form-input" placeholder="请输入进货总价" />)}
               </Form.Item>
-              <Form.Item label="年龄">
-                {getFieldDecorator('age', {
-                  rules: [{ message: '请输入年龄' }]
-                })(<Input className="form-input" placeholder="请输入年龄" />)}
+              <Form.Item label="批发单价">
+                {getFieldDecorator('midSingle', {
+                  rules: [{ message: '请输入批发单价' }]
+                })(<Input className="form-input" placeholder="请输入批发单价" />)}
               </Form.Item>
-              <Form.Item label="商品类型">
-                {getFieldDecorator('role_id', {
-                  rules: [{ required: true, message: '请选择所属商品类型' }]
-                })(<Select
-                  notFoundContent="暂未找到"
-                  placeholder="请选择所属商品类型" >
-                  {roles}
-                </Select>)}
+              <Form.Item label="批发总价">
+                {getFieldDecorator('midAll', {
+                  rules: [{ message: '请输入批发总价' }]
+                })(<Input className="form-input" placeholder="请输入批发总价" />)}
               </Form.Item>
-              <Form.Item label="个性签名">
-                {getFieldDecorator('sign', {
-                  rules: [{ message: '请输入个性签名' }]
-                })(<Input className="form-input" placeholder="请输入个性签名" />)}
+              <Form.Item label="零售单价">
+                {getFieldDecorator('sellSingle', {
+                  rules: [{ message: '请输入零售单价' }]
+                })(<Input className="form-input" placeholder="请输入零售单价" />)}
               </Form.Item>
-              <Form.Item label="头像地址">
-                {getFieldDecorator('avatar', {
-                  rules: [{ message: '请输入头像地址' }]
-                })(<Input className="form-input" placeholder="请输入头像地址" />)}
+              <Form.Item label="零售总价">
+                {getFieldDecorator('sellAll', {
+                  rules: [{ message: '请输入零售总价' }]
+                })(<Input className="form-input" placeholder="请输入零售总价" />)}
+              </Form.Item>
+              <Form.Item label="商品数量">
+                {getFieldDecorator('num', {
+                  rules: [{ message: '请输入商品数量' }]
+                })(<Input className="form-input" placeholder="请输入商品数量" />)}
+              </Form.Item>
+              <Form.Item label="商品描述">
+                {getFieldDecorator('desc', {
+                  rules: [{ message: '请输入商品描述' }]
+                })(<Input className="form-input" placeholder="请输入商品描述" />)}
+              </Form.Item>
+              <Form.Item label="商品来源">
+                {getFieldDecorator('origin', {
+                  rules: [{ message: '请输入商品来源' }]
+                })(<Input className="form-input" placeholder="请输入商品来源" />)}
               </Form.Item>
             </Form>
         </Modal>
