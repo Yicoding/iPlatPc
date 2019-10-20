@@ -10,7 +10,8 @@ import {
   Input,
   message,
   Select,
-  Tag
+  Tag,
+  Pagination
 } from 'antd';
 
 import { connect } from 'react-redux';
@@ -34,15 +35,6 @@ class Goods extends Component {
     { title: '商品数量', dataIndex: 'num', key: 'num', align: 'center' },
     { title: '商品描述', dataIndex: 'desc', key: 'desc', align: 'center' },
     { title: '商品来源', dataIndex: 'origin', key: 'origin', align: 'center' },
-    { title: '商品类别', key: 'typeName', align: 'center', width: 200, render: (text) => (
-      <div>
-        {
-          text.typeName.map((item, index) => {
-            return <Tag key={index} color={colorArr[index]}>{item.name}</Tag>
-          })
-        }
-      </div>
-    ) },
     { title: '商品图片', dataIndex: 'coverImg', key: 'coverImg', align: 'center', width: 150 },
     { title: '操作', key: 'edit', align: 'center', fixed: 'right', render: (text) => (
       <div>
@@ -65,6 +57,10 @@ class Goods extends Component {
     super(props)
     this.state = {
       dataList: [],
+      loading: false, // 表格loading
+      pageSize: 10,
+      pageIndex: 0,
+      total: 0,
       title: '',
       visible: false,
       confirmLoading: false,
@@ -76,24 +72,43 @@ class Goods extends Component {
   componentDidMount() {
     console.log('form------', this.props.form)
     const { company_id } = this.props
+    let { columns } = this
     this.getGoodsList()
     if (!company_id) {
       this.getCompanyList()
     } else {
       this.getUnitList()
       this.getGoodsTypeList()
+      columns.splice(columns.length - 1, 0, { title: '商品类别', key: 'typeName', align: 'center', width: 200, render: (text) => (
+        <div>
+          {
+            text.typeName.map((item, index) => {
+              return <Tag key={index} color={colorArr[index]}>{item.name}</Tag>
+            })
+          }
+        </div>
+      ) })
     }
   }
   // 获取商品列表
   async getGoodsList() {
+    const { company_id } = this.props
+    const { pageIndex, pageSize } = this.state;
+    this.setState({ loading: true });
     try {
-      const { company_id } = this.props
-      let { data } = await api.getGoodsList({
-        company_id: company_id
+      let { data: { data, total } } = await api.getGoodsList({
+        company_id: company_id,
+        pageIndex,
+        pageSize,
       })
       console.log(data)
-      this.setState({ dataList: data })
+      this.setState({
+        dataList: data,
+        total: total,
+        loading: false,
+      });
     } catch(e) {
+      this.setState({ loading: false });
       console.log('getGoodsList', e)
     }
   }
@@ -122,12 +137,12 @@ class Goods extends Component {
       this.dataTypes = data
       const optionTypes = data.map(item => <Option key={item.id} value={item.id}>{item.name}</Option>);
       this.setState({ optionTypes });
-      if (text) {
-        const { form } = this.props;
-        form.setFieldsValue({
-          typeName: text.typeName.map(item => item.id)
-        });
-      }
+      // if (text) {
+      //   const { form } = this.props;
+      //   form.setFieldsValue({
+      //     typeName: text.typeName.map(item => item.id)
+      //   });
+      // }
     } catch(e) {
       console.log('getGoodsTypeList', e)
     }
@@ -156,6 +171,17 @@ class Goods extends Component {
     } catch(e) {
       console.log('getUnitList', e)
     }
+  }
+
+  // 分页器
+  // 条数改变
+  onShowSizeChange = (current, pageSize) => {
+    console.log(current, pageSize);
+  }
+
+  // 页码改变
+  onChangePage = (page, pageSize) => {
+    console.log(page, pageSize);
   }
 
   // 新增按钮
@@ -188,7 +214,6 @@ class Goods extends Component {
   // 编辑按钮
   edit = (text) => {
     console.log(text);
-    console.log('text.typeName.map(item => item.id)', text.typeName.map(item => item.id));
     this.type = 'edit'
     this.id = text.id
     const { form, company_id } = this.props
@@ -206,7 +231,7 @@ class Goods extends Component {
       num: text.num,
       desc: text.desc,
       origin: text.origin,
-      typeName: text.typeName.map(item => item.id)
+      typeName: company_id ? text.typeName.map(item => item.id) : text.typeName
     });
     this.setState({
       title: '编辑商品',
@@ -216,7 +241,7 @@ class Goods extends Component {
     // root编辑时，需要根据公司查询该公司的单位列表
     if (!company_id) {
       this.getUnitList(text.company_id, text)
-      this.getGoodsTypeList(text.company_id, text)
+      // this.getGoodsTypeList(text.company_id, text)
     }
   }
   // 删除按钮
@@ -239,7 +264,7 @@ class Goods extends Component {
   // 删除逻辑
   async removeFuc(text) {
     try {
-      api.removeUser({
+      api.removeGoods({
         id: text.id
       })
       const index = this.state.dataList.findIndex(item => item.id === text.id)
@@ -272,7 +297,7 @@ class Goods extends Component {
         let info = '创建成功，商品家族又添新同胞啦'
         let dataList = this.state.dataList
         if (this.type === 'add') { // 新增
-          let { data } = await api.addUser(values)
+          let { data } = await api.addGoods(values)
           console.log(data);
           dataList.push({
             id: data.id,
@@ -335,7 +360,7 @@ class Goods extends Component {
       showUnit: true
     })
     this.getUnitList(val)
-    this.getGoodsTypeList(val)
+    // this.getGoodsTypeList(val)
     const { form } = this.props
     form.setFieldsValue({
       unitOne_id: null,
@@ -349,11 +374,11 @@ class Goods extends Component {
       add,
       columns,
       optionCompanys,
-      // optionTypes,
-      // optionUints,
       handleOk,
       handleCancel,
-      companyHandle
+      companyHandle,
+      onShowSizeChange,
+      onChangePage
     } = this
     const {
       dataList,
@@ -362,7 +387,8 @@ class Goods extends Component {
       showUnit,
       confirmLoading,
       optionUints,
-      optionTypes
+      optionTypes,
+      total
     } = this.state
     const { company_id } = this.props
     const { getFieldDecorator } = this.props.form;
@@ -371,7 +397,16 @@ class Goods extends Component {
         <div className="table-filter-box">
           <Button type="primary" icon="plus" onClick={add}>添加</Button>
         </div>
-        <Table columns={columns} dataSource={dataList} rowKey="id" scroll={{ x: 1880 }} />
+        <Table columns={columns} pagination={false} dataSource={dataList} rowKey="id" scroll={{ x: company_id ? 1880 : 1650 }} />
+        <Pagination
+          className="pagination"
+          showSizeChanger
+          onShowSizeChange={onShowSizeChange}
+          total={total}
+          onChange={onChangePage}
+          showQuickJumper
+          pageSizeOptions={['3', '10', '20', '50', '100']}
+        />
         <Modal
           title={title}
           visible={visible}
@@ -428,7 +463,7 @@ class Goods extends Component {
                 )
               }
               {
-                (showUnit || company_id) && (
+                company_id && (
                   <Form.Item label="商品类别">
                     {getFieldDecorator('typeName', {
                       rules: [{ required: true, message: '请选择所属商品类别' }]
