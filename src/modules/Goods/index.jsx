@@ -47,9 +47,9 @@ class Goods extends Component {
   dataCompanys = [] // 公司数据列表
   optionCompanys = [] // 公司选择器列表
   dataUnits = [] // 单位数据列表
-  // optionUints = [] // 单位选择器列表
   dataTypes = [] // 商品类别数据列表
-  // optionTypes = [] // 商品类别选择器列表
+  pageIndex = 0 // 当前页数
+  pageSize = 10 // 每页条数
   
   type = ''
   id = 0
@@ -58,8 +58,6 @@ class Goods extends Component {
     this.state = {
       dataList: [],
       loading: false, // 表格loading
-      pageSize: 10,
-      pageIndex: 0,
       total: 0,
       title: '',
       visible: false,
@@ -82,6 +80,7 @@ class Goods extends Component {
       columns.splice(columns.length - 1, 0, { title: '商品类别', key: 'typeName', align: 'center', width: 200, render: (text) => (
         <div>
           {
+            text.typeName === '0' ? '--' :
             text.typeName.map((item, index) => {
               return <Tag key={index} color={colorArr[index]}>{item.name}</Tag>
             })
@@ -91,9 +90,9 @@ class Goods extends Component {
     }
   }
   // 获取商品列表
-  async getGoodsList() {
+  async getGoodsList(totalAll) {
     const { company_id } = this.props
-    const { pageIndex, pageSize } = this.state;
+    const { pageIndex, pageSize } = this;
     this.setState({ loading: true });
     try {
       let { data: { data, total } } = await api.getGoodsList({
@@ -104,7 +103,7 @@ class Goods extends Component {
       console.log(data)
       this.setState({
         dataList: data,
-        total: total,
+        total: totalAll || total,
         loading: false,
       });
     } catch(e) {
@@ -177,11 +176,16 @@ class Goods extends Component {
   // 条数改变
   onShowSizeChange = (current, pageSize) => {
     console.log(current, pageSize);
+    this.pageSize = pageSize;
+    this.pageIndex = 0;
+    this.getGoodsList();
   }
 
   // 页码改变
   onChangePage = (page, pageSize) => {
     console.log(page, pageSize);
+    this.pageIndex = page - 1;
+    this.getGoodsList();
   }
 
   // 新增按钮
@@ -231,7 +235,7 @@ class Goods extends Component {
       num: text.num,
       desc: text.desc,
       origin: text.origin,
-      typeName: company_id ? text.typeName.map(item => item.id) : text.typeName
+      typeName: company_id ? text.typeName === '0' ? [] : text.typeName.map(item => item.id) : text.typeName
     });
     this.setState({
       title: '编辑商品',
@@ -264,14 +268,16 @@ class Goods extends Component {
   // 删除逻辑
   async removeFuc(text) {
     try {
-      api.removeGoods({
+      await api.removeGoods({
         id: text.id
       })
-      const index = this.state.dataList.findIndex(item => item.id === text.id)
       message.success('删除成功');
-      const dataList = this.state.dataList
-      dataList.splice(index, 1)
-      this.setState({ dataList })
+      const { dataList } = this.state;
+      if (dataList.length === 1) {
+        this.pageIndex -= 1;
+      }
+      const total = this.state.total - 1;
+      this.getGoodsList(total);
     } catch(e) {
       console.log('removeError', e)
     }
@@ -288,54 +294,21 @@ class Goods extends Component {
       if (company_id) {
         values.company_id = userInfo.company_id
       }
-      let index = this.dataCompanys.findIndex(item => item.id === values.company_id)
-      let companyName = !company_id ? this.dataCompanys[index].name : userInfo.companyName
-      let roleIndex = this.dataTypes.findIndex(item => item.id === values.role_id)
-      let role_fullName = this.dataTypes[roleIndex].fullName
       try {
         this.setState({ confirmLoading: true })
-        let info = '创建成功，商品家族又添新同胞啦'
-        let dataList = this.state.dataList
+        let info = '创建成功，商品家族又添新同胞啦';
         if (this.type === 'add') { // 新增
           let { data } = await api.addGoods(values)
           console.log(data);
-          dataList.push({
-            id: data.id,
-            name: values.name,
-            phone: values.phone,
-            password: values.password,
-            age: values.age,
-            company_id: values.company_id,
-            companyName: companyName,
-            role_id: values.role_id,
-            role_fullName: role_fullName,
-            sign: values.sign,
-            avatar: values.avatar
-          })
-          this.setState({ dataList })
+          this.getGoodsList();
         } else {
-          await api.updateUser(Object.assign({}, values, {
+          await api.updateGoods(Object.assign({}, values, {
             id: this.id
           }))
-          info = '更新成功'
-          let index = dataList.findIndex(item => item.id === this.id)
-          let item = dataList[index]
-          Object.assign(item, {
-            name: values.name,
-            name: values.name,
-            phone: values.phone,
-            password: values.password,
-            age: values.age,
-            company_id: values.company_id,
-            companyName: companyName,
-            role_id: values.role_id,
-            role_fullName: role_fullName,
-            sign: values.sign,
-            avatar: values.avatar
-          })
+          info = '更新成功';
+          this.getGoodsList();
         }
         this.setState({
-          dataList,
           visible: false,
           confirmLoading: false
         })
@@ -378,7 +351,9 @@ class Goods extends Component {
       handleCancel,
       companyHandle,
       onShowSizeChange,
-      onChangePage
+      onChangePage,
+      pageIndex,
+      pageSize
     } = this
     const {
       dataList,
@@ -388,7 +363,7 @@ class Goods extends Component {
       confirmLoading,
       optionUints,
       optionTypes,
-      total
+      total,
     } = this.state
     const { company_id } = this.props
     const { getFieldDecorator } = this.props.form;
@@ -405,7 +380,9 @@ class Goods extends Component {
           total={total}
           onChange={onChangePage}
           showQuickJumper
-          pageSizeOptions={['3', '10', '20', '50', '100']}
+          current={pageIndex+1}
+          defaultPageSize={pageSize}
+          pageSizeOptions={['1', '3', '10', '20', '50', '100']}
         />
         <Modal
           title={title}
@@ -462,6 +439,11 @@ class Goods extends Component {
                   </Form.Item>
                 )
               }
+              <Form.Item label="商品数量">
+                {getFieldDecorator('num', {
+                  rules: [{ required: true, message: '请输入商品数量' }]
+                })(<Input className="form-input" placeholder="请输入商品数量" />)}
+              </Form.Item>
               {
                 company_id && (
                   <Form.Item label="商品类别">
@@ -488,28 +470,23 @@ class Goods extends Component {
               </Form.Item>
               <Form.Item label="批发单价">
                 {getFieldDecorator('midSingle', {
-                  rules: [{ message: '请输入批发单价' }]
+                  rules: [{ required: true, message: '请输入批发单价' }]
                 })(<Input className="form-input" placeholder="请输入批发单价" />)}
               </Form.Item>
               <Form.Item label="批发总价">
                 {getFieldDecorator('midAll', {
-                  rules: [{ message: '请输入批发总价' }]
+                  rules: [{ required: true, message: '请输入批发总价' }]
                 })(<Input className="form-input" placeholder="请输入批发总价" />)}
               </Form.Item>
               <Form.Item label="零售单价">
                 {getFieldDecorator('sellSingle', {
-                  rules: [{ message: '请输入零售单价' }]
+                  rules: [{ required: true, message: '请输入零售单价' }]
                 })(<Input className="form-input" placeholder="请输入零售单价" />)}
               </Form.Item>
               <Form.Item label="零售总价">
                 {getFieldDecorator('sellAll', {
-                  rules: [{ message: '请输入零售总价' }]
+                  rules: [{ required: true, message: '请输入零售总价' }]
                 })(<Input className="form-input" placeholder="请输入零售总价" />)}
-              </Form.Item>
-              <Form.Item label="商品数量">
-                {getFieldDecorator('num', {
-                  rules: [{ message: '请输入商品数量' }]
-                })(<Input className="form-input" placeholder="请输入商品数量" />)}
               </Form.Item>
               <Form.Item label="商品描述">
                 {getFieldDecorator('desc', {

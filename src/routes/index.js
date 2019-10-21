@@ -4,14 +4,16 @@ import { Switch, Route } from 'react-router-dom';
 import AllComponents from '../modules';
 import config from './config';
 
+import OrderDetail from '../modules/Order/detail';
+
 export default class RouteConfig extends Component {
   // 渲染初始化路由 /app时
   _renderInitRoute = role => {
     if (role && config[role] && config[role].length > 0) {
       const Component = AllComponents[config[role][0].component]
       return (
-        <Route path="/app" exact render={() => {
-          return <Component />
+        <Route path="/app" exact render={(props) => {
+          return <Component {...props} />
         }} />
       )
     }
@@ -29,8 +31,8 @@ export default class RouteConfig extends Component {
               key={item.route}
               path={item.route}
               exact
-              render={() => {
-                return <Component />
+              render={(props) => {
+                return <Component {...props} />
               }} />
           )
         })
@@ -43,6 +45,12 @@ export default class RouteConfig extends Component {
     return (
       <Switch>
         {this._renderInitRoute(role)}
+        {
+          role && role === 'admin' &&
+          <Route path="/app/order/:order_id" exact render={(props) => {
+            return <OrderDetail {...props} />
+          }} />
+        }
         {this._renderRouteList(role)}
       </Switch>
     )

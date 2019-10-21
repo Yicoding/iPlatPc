@@ -36,6 +36,11 @@ let apiMap = {
   addUnit: ['POST', '/addUnit'], // 新增单位
   updateUnit: ['PUT', '/updateUnit'], // 更新单个单位
   removeUnit: ['DELETE', '/removeUnit'], // 删除单个单位
+  // 订单
+  getOrderList: ['GET', '/getOrderList'], // 查看订单列表
+  getOrderDetail: ['GET', '/getOrderDetail'], // 查看单个订单详情
+  updateOrder: ['PUT', '/updateOrder'], // 更新单个订单
+  removeOrder: ['DELETE', '/removeOrder'], // 删除单个订单
 }
 
 export default apiMap
