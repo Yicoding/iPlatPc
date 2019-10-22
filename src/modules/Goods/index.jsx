@@ -17,7 +17,7 @@ import {
 import { connect } from 'react-redux';
 import { api } from '../../api/index.js'
 
-const colorArr = ['green', 'cyan', 'purple', 'geekblue', 'blue']
+const colorArr = ['green', 'cyan', 'purple', 'geekblue', 'blue'];
 
 class Goods extends Component {
   columns = [

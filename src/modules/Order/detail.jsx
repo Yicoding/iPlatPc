@@ -6,19 +6,23 @@ import {
   Table,
   Button,
   Modal,
-  Form,
-  Input,
   message,
-  Select,
   Card,
   Col,
-  Row
+  Row,
+  Steps,
+  Divider,
+  Tag
 } from 'antd';
 
 import { connect } from 'react-redux';
 import { api } from '../../api/index.js'
 
-class Map extends Component {
+const { Step } = Steps;
+
+const colorArr = ['green', 'cyan', 'purple', 'geekblue', 'blue']
+
+class OrderDetail extends Component {
   columns = [
     { title: 'id', dataIndex: 'id', key: 'id', align: 'center' },
     { title: '商品id', dataIndex: 'good_id', key: 'good_id', align: 'center' },
@@ -29,237 +33,164 @@ class Map extends Component {
     { title: '数量', dataIndex: 'num', key: 'num', align: 'center' },
     { title: '总计', dataIndex: 'total', key: 'total', align: 'center' },
     { title: '利润', dataIndex: 'gain', key: 'gain', align: 'center' },
+    { title: '商品类型', dataIndex: 'typeName', key: 'typeName', align: 'center', render: (text) => {
+      return text.map((item, i) => {
+        return <Tag color={colorArr[i]}>{item}</Tag>
+      })
+    } },
   ]
-  children = []
-  options = []
-  type = ''
-  id = 0
   constructor(props) {
     super(props)
     this.state = {
+      orderInfo: {},
       dataList: [],
-      title: '',
-      visible: false,
-      confirmLoading: false
+      total: 0,
     }
   }
+
   componentDidMount() {
-    const { company_id } = this.props
-    this.getGoodsTypeList()
-    if (!company_id) {
-      this.getCompanyList()
-    }
+    console.log('orderthis.props', this.props)
+    this.getOrderDetail();
+    this.getOrderDetailList();
   }
-  // 获取类型列表
-  async getGoodsTypeList() {
+
+  // 查看单个订单详情
+  async getOrderDetail() {
+    const { match: { params: { order_id } } } = this.props;
     try {
-      const { company_id } = this.props
-      let { data } = await api.getGoodsTypeList({
-        company_id: company_id
-      })
-      console.log(data)
-      this.setState({ dataList: data })
+      const { data } = await api.getOrderDetail({
+        id: order_id,
+        role: 'admin'
+      });
+      this.setState({ orderInfo: data });
     } catch(e) {
-      console.log('getGoodsTypeList', e)
+      console.log('getOrderDetail接口报错：', e);
     }
   }
-  // 获取公司列表
-  async getCompanyList() {
-    const { Option } = Select;
+
+  // 单个订单包含的商品列表
+  async getOrderDetailList() {
+    const { match: { params: { order_id } } } = this.props;
     try {
-      let { data } = await api.getCompanyList()
-      console.log(data)
-      this.options = data
-      this.children = data.map(item => <Option key={item.id} value={item.id}>{item.name}</Option>)
+      const { data: { data, total } } = await api.getOrderDetailList({ order_id: order_id });
+      this.setState({
+        dataList: data,
+        total
+      });
     } catch(e) {
-      console.log('getCompanyList报错', e)
+      console.log('getOrderDetailList接口报错：', e);
     }
   }
-  // 新增按钮
-  add = () => {
-    console.log('add');
-    this.type = 'add'
-    let { form, userInfo, company_id } = this.props
-    this.setState({
-      title: '新增类型',
-      visible: true
-    })
-    form.setFieldsValue({
-      name: '',
-      company_id: !company_id ? null : userInfo.company_id
-    });
-  }
+
   // 编辑按钮
-  edit = (text) => {
-    console.log(text);
-    this.type = 'edit'
-    this.id = text.id
-    let { form } = this.props
-    this.setState({
-      title: '编辑类型',
-      visible: true
-    })
-    form.setFieldsValue({
-      name: text.name,
-      company_id: text.company_id
-    });
-  }
-  // 删除按钮
-  remove = (text) => {
+  edit = state => {
+    console.log(state);
+    const config = {
+      2: '收款',
+      3: '发货'
+    }
     const { confirm } = Modal
     confirm({
-      title: `确定要删除${text.name}吗`,
+      title: `确定${config[state]}吗`,
       okText: '确定',
       okType: 'danger',
       cancelText: '取消',
       onOk: () => {
         console.log('OK');
-        this.removeFuc(text)
+        this.handleOk(state);
       },
       onCancel() {
         console.log('Cancel');
       },
     });
   }
-  // 删除逻辑
-  async removeFuc(text) {
+
+  // 确定修改
+  handleOk = async state => {
+    const { userInfo, match: { params: { order_id } } } = this.props;
+    let values = {
+      id: order_id,
+      state,
+      user_id: userInfo.id
+    };
     try {
-      api.removeGoodsType({
-        id: text.id
-      })
-      let index = this.state.dataList.findIndex(item => item.id === text.id)
-      message.success('删除成功');
-      let dataList = this.state.dataList
-      dataList.splice(index, 1)
-      this.setState({ dataList })
+      await api.updateOrder(values);
+      message.success('修改成功');
+      this.getOrderDetail();
     } catch(e) {
-      console.log('removeError', e)
+      message.error('修改失败');
+      console.log('handleOk报错', e);
     }
   }
-  // 确定按钮
-  handleOk = () => {
-    let { validateFields } = this.props.form
-    const { userInfo, company_id } = this.props
-    validateFields(async(err, values) => {
-      if (err) {
-        return console.log('handleOkError', err)
-      }
-      console.log('form', values)
-      if (company_id) {
-        values.company_id = userInfo.company_id
-      }
-      let index = this.options.findIndex(item => item.id === values.company_id)
-      let companyName = !company_id ? this.options[index].name : userInfo.companyName
-      try {
-        this.setState({ confirmLoading: true })
-        let info = '创建成功，类型家族又添新同胞啦'
-        let dataList = this.state.dataList
-        if (this.type === 'add') { // 新增
-          let { data } = await api.addGoodsType(values)
-          console.log(data);
-          dataList.push({
-            id: data.id,
-            name: values.name,
-            company_id: values.company_id,
-            companyName: companyName
-          })
-          this.setState({ dataList })
-        } else {
-          await api.updateGoodsType(Object.assign({}, values, {
-            id: this.id
-          }))
-          info = '更新成功'
-          let index = dataList.findIndex(item => item.id === this.id)
-          let item = dataList[index]
-          Object.assign(item, {
-            name: values.name,
-            company_id: values.company_id,
-            companyName: companyName
-          })
-        }
-        this.setState({
-          dataList,
-          visible: false,
-          confirmLoading: false
-        })
-        message.success(info);
-      } catch(e) {
-        console.log('handleOkError', e)
-      }
-    });
-  }
-  // 验证表单
-  hasErrors(fieldsError) {
-    return Object.keys(fieldsError).some(field => fieldsError[field]);
-  }
-  // 取消按钮
-  handleCancel = () => {
-    this.setState({ visible: false })
-  }
-  // 渲染弹窗中的公司选择器
-  _renderFormCompany = role_name => {
-    const { getFieldDecorator } = this.props.form;
-    const { children } = this
-    const { company_id } = this.props
-    if (!company_id) {
-      return (
-        <Form.Item label="所属公司">
-          {getFieldDecorator('company_id', {
-            rules: [{ required: true, message: '请选择所属公司' }]
-          })(<Select
-            notFoundContent="暂未找到"
-            placeholder="请选择所属公司" >
-            {children}
-          </Select>)}
-        </Form.Item>
-      )
+
+  // 付款
+  RenderStepPay = item => {
+    const { state } = item;
+    if (state === 1) { // 待付款
+      return <Step title="待付款" description={<Button type="primary" onClick={() => this.edit(2)}>确认付款</Button>} />;
     }
-    return null
+    return <Step title="已付款" description={item.payTime} />; // 已付款
   }
+
+  // 发货
+  RenderStepFinish = item => {
+    const { state } = item;
+    if (state === 1) {
+      return <Step title="待发货" description="先收款才能发货哦" />;
+    }
+    if (state === 3) { // 已发货
+      return <Step title="已发货" description={item.finishTime} />;
+    }
+    return <Step title="待发货" description={<Button type="primary" onClick={() => this.edit(3)}>确认发货</Button>} />; // 待发货
+  }
+
   render() {
     const {
-      add,
       columns,
-      handleOk,
-      handleCancel
+      RenderStepPay,
+      RenderStepFinish
     } = this
     const {
+      orderInfo,
       dataList,
-      title,
-      visible,
-      confirmLoading
+      total,
     } = this.state
     const { userInfo } = this.props
-    const { getFieldDecorator } = this.props.form;
+    const { match: { params: { order_id } } } = this.props;
     return (
-      <div>
-        <div className="table-filter-box">
-          <Button type="primary" icon="plus" onClick={add}>添加</Button>
+      <div className="order-detail">
+        <p className="total">订单编号：<span className="blue">{order_id}</span></p>
+        <div className="card">
+          <Row gutter={16}>
+            <Col span={8}>
+              <Card title="合计成本" bordered={false}>
+                {orderInfo.spend}
+              </Card>
+            </Col>
+            <Col span={8}>
+              <Card title="合计售价" bordered={false}>
+                {orderInfo.total}
+              </Card>
+            </Col>
+            <Col span={8}>
+              <Card title="合计利润" bordered={false}>
+                {orderInfo.gain}
+              </Card>
+            </Col>
+          </Row>
         </div>
+        <Steps current={orderInfo.state}>
+          <Step title="已创建" description={orderInfo.createTime} />
+          {RenderStepPay(orderInfo)}
+          {RenderStepFinish(orderInfo)}
+        </Steps>
+        <Divider dashed />
+        <p className="total">共<span>{total}</span>条数据</p>
         <Table columns={columns} dataSource={dataList} rowKey="id" />
-        <Modal
-          title={title}
-          visible={visible}
-          confirmLoading={confirmLoading}
-          onOk={handleOk}
-          okText="确定"
-          onCancel={handleCancel} 
-          cancelText="取消" >
-            <Form>
-              <Form.Item label="类型名称">
-                {getFieldDecorator('name', {
-                  rules: [{ required: true, whitespace: true, message: '请输入类型名称' }]
-                })(<Input className="form-input" placeholder="请输入类型名称" />)}
-              </Form.Item>
-              {this._renderFormCompany(userInfo.role_name)}
-            </Form>
-        </Modal>
       </div>
     )
   }
 }
-
-const WrappedHorizontalLoginForm = Form.create({ name: 'Map' })(Map)
 
 const mapStateToProps = function(store) {
   return {
@@ -268,4 +199,4 @@ const mapStateToProps = function(store) {
   };
 };
 
-export default connect(mapStateToProps)(WrappedHorizontalLoginForm);
+export default connect(mapStateToProps)(OrderDetail);

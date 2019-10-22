@@ -16,7 +16,9 @@ import { api } from '../../api/index.js'
 
 class Order extends Component {
   columns = [
-    { title: 'id', dataIndex: 'id', key: 'id', align: 'center' },
+    { title: 'id', dataIndex: 'id', key: 'id', align: 'center', render: (text) => (
+      <div className="blue pointer" onClick={() => this.rowHandleClick(text)}>{text}</div>
+    ) },
     { title: '成本', dataIndex: 'spend', key: 'spend', align: 'center' },
     { title: '售价', dataIndex: 'total', key: 'total', align: 'center' },
     { title: '利润', dataIndex: 'gain', key: 'gain', align: 'center' },
@@ -185,14 +187,9 @@ class Order extends Component {
   }
 
   // 跳转到详情页
-  rowHandleClick = record => {
+  rowHandleClick = id => {
     const { history } = this.props;
-    return {
-      onClick: () => {
-        console.log(history)
-        history.push(`/app/order/${record.id}`);
-      }
-    };
+    history.push(`/app/order/${id}`);
   }
 
   render() {
@@ -214,8 +211,7 @@ class Order extends Component {
           columns={columns}
           dataSource={dataList}
           pagination={false}
-          rowKey="id"
-          onRow={rowHandleClick} />
+          rowKey="id" />
         <Pagination
           className="pagination"
           showSizeChanger

@@ -41,6 +41,7 @@ let apiMap = {
   getOrderDetail: ['GET', '/getOrderDetail'], // 查看单个订单详情
   updateOrder: ['PUT', '/updateOrder'], // 更新单个订单
   removeOrder: ['DELETE', '/removeOrder'], // 删除单个订单
+  getOrderDetailList: ['GET', '/getOrderDetailList'], // 单个订单包含的商品列表
 }
 
 export default apiMap

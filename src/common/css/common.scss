@@ -1,5 +1,6 @@
 html,body,#root{
   height: 100%;
+  user-select: auto;
 }
 
 .table-filter-box{
@@ -16,4 +17,12 @@ html,body,#root{
 
 .right-space{
   margin-right: 10px;
+}
+
+.blue{
+  color: #1890ff;
+}
+
+.pointer{
+  cursor: pointer;
 }
