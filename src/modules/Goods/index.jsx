@@ -23,7 +23,6 @@ class Goods extends Component {
   columns = [
     { title: 'id', dataIndex: 'id', key: 'id', align: 'center', fixed: 'left' },
     { title: '商品名', dataIndex: 'name', key: 'name', align: 'center', fixed: 'left' },
-    { title: '所属公司', dataIndex: 'companyName', key: 'companyName', align: 'center' },
     { title: '单价单位', dataIndex: 'unitOne.name', key: 'unitOne.name', align: 'center' },
     { title: '总单位', dataIndex: 'unitDouble.name', key: 'unitDouble.name', align: 'center' },
     { title: '进货单价(元)', dataIndex: 'buySingle', key: 'buySingle', align: 'center' },
@@ -35,7 +34,6 @@ class Goods extends Component {
     { title: '商品数量', dataIndex: 'num', key: 'num', align: 'center' },
     { title: '商品描述', dataIndex: 'desc', key: 'desc', align: 'center' },
     { title: '商品来源', dataIndex: 'origin', key: 'origin', align: 'center' },
-    { title: '商品图片', dataIndex: 'coverImg', key: 'coverImg', align: 'center', width: 150 },
     { title: '操作', key: 'edit', align: 'center', fixed: 'right', render: (text) => (
       <div>
         <Button className="right-space" icon="edit" onClick={() => this.edit(text)}>编辑</Button>
@@ -70,14 +68,15 @@ class Goods extends Component {
   componentDidMount() {
     console.log('form------', this.props.form)
     const { company_id } = this.props
-    let { columns } = this
+    const { columns } = this;
     this.getGoodsList()
     if (!company_id) {
       this.getCompanyList()
+      columns.splice(2, 0, { title: '所属公司', dataIndex: 'companyName', key: 'companyName', align: 'center' });
     } else {
       this.getUnitList()
-      this.getGoodsTypeList()
-      columns.splice(columns.length - 1, 0, { title: '商品类别', key: 'typeName', align: 'center', width: 200, render: (text) => (
+      this.getGoodsTypeList();
+      columns.splice(columns.length - 1, 0, { title: '商品类别', key: 'typeName', align: 'center', render: (text) => (
         <div>
           {
             text.typeName === '0' ? '--' :
@@ -372,7 +371,7 @@ class Goods extends Component {
         <div className="table-filter-box">
           <Button type="primary" icon="plus" onClick={add}>添加</Button>
         </div>
-        <Table columns={columns} pagination={false} dataSource={dataList} rowKey="id" scroll={{ x: company_id ? 1880 : 1650 }} />
+        <Table columns={columns} pagination={false} dataSource={dataList} rowKey="id" scroll={{ x: 'max-content' }} />
         <Pagination
           className="pagination"
           showSizeChanger

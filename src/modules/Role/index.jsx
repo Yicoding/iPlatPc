@@ -181,7 +181,7 @@ class Role extends Component {
         <div className="table-filter-box">
           <Button type="primary" icon="plus" onClick={add}>添加</Button>
         </div>
-        <Table columns={columns} dataSource={dataList} rowKey="id" />
+        <Table columns={columns} dataSource={dataList} rowKey="id" scroll={{ x: 'max-content' }} />
         <Modal
           title={title}
           visible={visible}

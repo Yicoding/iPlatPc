@@ -19,8 +19,6 @@ class Map extends Component {
   columns = [
     { title: 'id', dataIndex: 'id', key: 'id', align: 'center' },
     { title: '类型名称', dataIndex: 'name', key: 'name', align: 'center' },
-    { title: '所属公司', dataIndex: 'companyName', key: 'companyName', align: 'center' },
-    { title: '公司id', dataIndex: 'company_id', key: 'company_id', align: 'center' },
     { title: '操作', key: 'edit', align: 'center', render: (text) => (
       <div>
         <Button className="right-space" icon="edit" onClick={() => this.edit(text)}>编辑</Button>
@@ -42,10 +40,13 @@ class Map extends Component {
     }
   }
   componentDidMount() {
-    const { company_id } = this.props
+    const { company_id } = this.props;
+    const { columns } = this;
     this.getGoodsTypeList()
     if (!company_id) {
-      this.getCompanyList()
+      this.getCompanyList();
+      columns.splice(2, 0, { title: '公司id', dataIndex: 'company_id', key: 'company_id', align: 'center' });
+      columns.splice(3, 0, { title: '所属公司', dataIndex: 'companyName', key: 'companyName', align: 'center' });
     }
   }
   // 获取类型列表
@@ -234,7 +235,7 @@ class Map extends Component {
         <div className="table-filter-box">
           <Button type="primary" icon="plus" onClick={add}>添加</Button>
         </div>
-        <Table columns={columns} dataSource={dataList} rowKey="id" />
+        <Table columns={columns} dataSource={dataList} rowKey="id" scroll={{ x: 'max-content' }} />
         <Modal
           title={title}
           visible={visible}

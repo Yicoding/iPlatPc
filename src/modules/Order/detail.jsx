@@ -12,7 +12,8 @@ import {
   Row,
   Steps,
   Divider,
-  Tag
+  Tag,
+  PageHeader
 } from 'antd';
 
 import { connect } from 'react-redux';
@@ -35,7 +36,7 @@ class OrderDetail extends Component {
     { title: '利润', dataIndex: 'gain', key: 'gain', align: 'center' },
     { title: '商品类型', dataIndex: 'typeName', key: 'typeName', align: 'center', render: (text) => {
       return text.map((item, i) => {
-        return <Tag color={colorArr[i]}>{item}</Tag>
+        return <Tag key={i} color={colorArr[i]}>{item}</Tag>
       })
     } },
   ]
@@ -144,11 +145,18 @@ class OrderDetail extends Component {
     return <Step title="待发货" description={<Button type="primary" onClick={() => this.edit(3)}>确认发货</Button>} />; // 待发货
   }
 
+  // 返回
+  goBack = () => {
+    const { history } = this.props;
+    history.goBack();
+  }
+
   render() {
     const {
       columns,
       RenderStepPay,
-      RenderStepFinish
+      RenderStepFinish,
+      goBack
     } = this
     const {
       orderInfo,
@@ -159,7 +167,12 @@ class OrderDetail extends Component {
     const { match: { params: { order_id } } } = this.props;
     return (
       <div className="order-detail">
-        <p className="total">订单编号：<span className="blue">{order_id}</span></p>
+        <PageHeader
+          className="page-header"
+          onBack={() => goBack()}
+          title="订单编号："
+          subTitle={<span className="blue">{order_id}</span>}
+        />
         <div className="card">
           <Row gutter={16}>
             <Col span={8}>
@@ -186,7 +199,7 @@ class OrderDetail extends Component {
         </Steps>
         <Divider dashed />
         <p className="total">共<span>{total}</span>条数据</p>
-        <Table columns={columns} dataSource={dataList} rowKey="id" />
+        <Table columns={columns} dataSource={dataList} rowKey="id" scroll={{ x: 'max-content' }} />
       </div>
     )
   }

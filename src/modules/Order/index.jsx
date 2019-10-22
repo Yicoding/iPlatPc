@@ -16,7 +16,7 @@ import { api } from '../../api/index.js'
 
 class Order extends Component {
   columns = [
-    { title: 'id', dataIndex: 'id', key: 'id', align: 'center', render: (text) => (
+    { title: 'id', dataIndex: 'id', key: 'id', align: 'center', fixed: 'left', render: (text) => (
       <div className="blue pointer" onClick={() => this.rowHandleClick(text)}>{text}</div>
     ) },
     { title: '成本', dataIndex: 'spend', key: 'spend', align: 'center' },
@@ -55,7 +55,7 @@ class Order extends Component {
         return <Button type="primary" icon="delete" onClick={() => this.edit(text.id, 3)}>确认发货</Button>;
       }
     } },
-    { title: '操作', key: 'edit', align: 'center', render: (text) => (
+    { title: '操作', key: 'edit', align: 'center', fixed: 'right', render: (text) => (
       <Button type="danger" icon="delete" onClick={() => this.remove(text)}>删除</Button>
     )},
   ]
@@ -211,6 +211,7 @@ class Order extends Component {
           columns={columns}
           dataSource={dataList}
           pagination={false}
+          scroll={{ x: 'max-content' }}
           rowKey="id" />
         <Pagination
           className="pagination"

@@ -22,7 +22,6 @@ class User extends Component {
     { title: '手机号', dataIndex: 'phone', key: 'phone', align: 'center' },
     { title: '密码', dataIndex: 'password', key: 'password', align: 'center' },
     { title: '年龄', dataIndex: 'age', key: 'age', align: 'center' },
-    { title: '所属公司', dataIndex: 'companyName', key: 'companyName', align: 'center' },
     { title: '角色', dataIndex: 'role_fullName', key: 'role_fullName', align: 'center' },
     { title: '个性签名', dataIndex: 'sign', key: 'sign', align: 'center' },
     { title: '操作', key: 'edit', align: 'center', render: (text) => (
@@ -48,11 +47,13 @@ class User extends Component {
     }
   }
   componentDidMount() {
-    const { company_id } = this.props
+    const { company_id } = this.props;
+    const { columns } = this;
     this.getUserList()
     this.getRoleList()
     if (!company_id) {
       this.getCompanyList()
+      columns.splice(5, 0, { title: '所属公司', dataIndex: 'companyName', key: 'companyName', align: 'center' });
     }
   }
   // 获取用户列表
@@ -287,7 +288,7 @@ class User extends Component {
         <div className="table-filter-box">
           <Button type="primary" icon="plus" onClick={add}>添加</Button>
         </div>
-        <Table columns={columns} dataSource={dataList} rowKey="id" />
+        <Table columns={columns} dataSource={dataList} rowKey="id" scroll={{ x: 'max-content' }} />
         <Modal
           title={title}
           visible={visible}
