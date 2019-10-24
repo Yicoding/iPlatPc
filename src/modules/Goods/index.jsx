@@ -133,14 +133,8 @@ class Goods extends Component {
       let { data } = await api.getGoodsTypeList(value)
       console.log(data)
       this.dataTypes = data
-      const optionTypes = data.map(item => <Option key={item.id} value={item.id}>{item.name}</Option>);
+      const optionTypes = data.map(item => <Option key={Number(item.code)} value={Number(item.code)}>{item.name}</Option>);
       this.setState({ optionTypes });
-      // if (text) {
-      //   const { form } = this.props;
-      //   form.setFieldsValue({
-      //     typeName: text.typeName.map(item => item.id)
-      //   });
-      // }
     } catch(e) {
       console.log('getGoodsTypeList', e)
     }
@@ -234,7 +228,7 @@ class Goods extends Component {
       num: text.num,
       desc: text.desc,
       origin: text.origin,
-      typeName: company_id ? text.typeName === '0' ? [] : text.typeName.map(item => item.id) : text.typeName
+      typeName: company_id ? text.typeName === '0' ? [] : text.typeName.map(item => Number(item.code)) : text.typeName
     });
     this.setState({
       title: '编辑商品',
