@@ -5,6 +5,7 @@ import AllComponents from '../modules';
 import config from './config';
 
 import OrderDetail from '../modules/Order/detail';
+import NotFound from '../pages/NotFound';
 
 export default class RouteConfig extends Component {
   // 渲染初始化路由 /app时
@@ -52,6 +53,9 @@ export default class RouteConfig extends Component {
           }} />
         }
         {this._renderRouteList(role)}
+        <Route path="/404" exact render={(props) => {
+          return <NotFound {...props} />
+        }} />
       </Switch>
     )
   }

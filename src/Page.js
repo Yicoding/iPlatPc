@@ -19,7 +19,7 @@ export default () => (
         <Route path="/app" component={(props) => <App {...props} />} />
         <Route path="/404" component={(props) => <NotFound {...props} />} />
         <Route path="/login" component={(props) => <Login {...props} />} />
-        <Route component={NotFound} />
+        <Route component={(props) => <NotFound {...props} />} />
       </Switch>
     </Router>
   </Provider>
