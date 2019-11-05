@@ -1,0 +1,16 @@
+.example{
+  height: 100%;
+  background: #6c6;
+  overflow: auto;
+  .header{
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    color: #fff;
+    background: red;
+  }
+  .child{
+    height: 3000px;
+  }
+}
