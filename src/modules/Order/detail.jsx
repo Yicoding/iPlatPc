@@ -12,7 +12,6 @@ import {
   Row,
   Steps,
   Divider,
-  Tag,
   PageHeader
 } from 'antd';
 
@@ -20,8 +19,6 @@ import { connect } from 'react-redux';
 import { api } from '../../api/index.js'
 
 const { Step } = Steps;
-
-const colorArr = ['green', 'cyan', 'purple', 'geekblue', 'blue']
 
 class OrderDetail extends Component {
   columns = [
@@ -33,12 +30,7 @@ class OrderDetail extends Component {
     { title: '售价', dataIndex: 'sale', key: 'sale', align: 'center' },
     { title: '数量', dataIndex: 'num', key: 'num', align: 'center' },
     { title: '总计', dataIndex: 'total', key: 'total', align: 'center' },
-    { title: '利润', dataIndex: 'gain', key: 'gain', align: 'center' },
-    { title: '商品类型', dataIndex: 'typeName', key: 'typeName', align: 'center', render: (text) => {
-      return text.map((item, i) => {
-        return <Tag key={i} color={colorArr[i]}>{item}</Tag>
-      })
-    } },
+    { title: '利润', dataIndex: 'gain', key: 'gain', align: 'center' }
   ]
   constructor(props) {
     super(props)
