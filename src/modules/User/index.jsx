@@ -14,6 +14,7 @@ import {
 
 import { connect } from 'react-redux';
 import { api } from '../../api/index.js'
+const { Option } = Select;
 
 class User extends Component {
   columns = [
@@ -23,6 +24,12 @@ class User extends Component {
     { title: '密码', dataIndex: 'password', key: 'password', align: 'center' },
     { title: '年龄', dataIndex: 'age', key: 'age', align: 'center' },
     { title: '角色', dataIndex: 'role_fullName', key: 'role_fullName', align: 'center' },
+    { title: '性别', dataIndex: 'sex', key: 'sex', align: 'center', render: (text) => {
+      if (text === 'man') {
+        return '男士';
+      }
+      return '女士';
+    } },
     { title: '个性签名', dataIndex: 'sign', key: 'sign', align: 'center' },
     { title: '操作', key: 'edit', align: 'center', render: (text) => (
       <div>
@@ -33,6 +40,10 @@ class User extends Component {
   ]
   children = []
   roles = []
+  sexs = [
+    <Option key={1} value="man">男士</Option>,
+    <Option key={2} value="woman">女士</Option>
+  ]
   options = []
   optionsRole = []
   type = ''
@@ -71,7 +82,6 @@ class User extends Component {
   }
   // 获取公司列表
   async getCompanyList() {
-    const { Option } = Select;
     try {
       let { data } = await api.getCompanyList()
       console.log(data)
@@ -83,7 +93,6 @@ class User extends Component {
   }
   // 获取角色列表
   async getRoleList() {
-    const { Option } = Select;
     try {
       const { company_id } = this.props
       let value = {
@@ -109,6 +118,7 @@ class User extends Component {
       age: '',
       company_id: !company_id ? null : userInfo.company_id,
       role_id: '',
+      sex: '',
       sign: '',
       avatar: ''
     });
@@ -130,6 +140,7 @@ class User extends Component {
       age: text.age,
       company_id: text.company_id,
       role_id: text.role_id,
+      sex: text.sex,
       sign: text.sign,
       avatar: text.avatar
     });
@@ -202,6 +213,7 @@ class User extends Component {
             company_id: values.company_id,
             companyName: companyName,
             role_id: values.role_id,
+            sex: values.sex,
             role_fullName: role_fullName,
             sign: values.sign,
             avatar: values.avatar
@@ -223,6 +235,7 @@ class User extends Component {
             company_id: values.company_id,
             companyName: companyName,
             role_id: values.role_id,
+            sex: values.sex,
             role_fullName: role_fullName,
             sign: values.sign,
             avatar: values.avatar
@@ -272,6 +285,7 @@ class User extends Component {
       add,
       columns,
       roles,
+      sexs,
       handleOk,
       handleCancel
     } = this
@@ -318,15 +332,6 @@ class User extends Component {
                   rules: [{ message: '请输入年龄' }]
                 })(<Input className="form-input" placeholder="请输入年龄" />)}
               </Form.Item>
-              {/* <Form.Item label="所属公司">
-                {getFieldDecorator('company_id', {
-                  rules: [{ required: true, message: '请选择所属公司' }]
-                })(<Select
-                  notFoundContent="暂未找到"
-                  placeholder="请选择所属公司" >
-                  {children}
-                </Select>)}
-              </Form.Item> */}
               {this._renderFormCompany(userInfo.role_name)}
               <Form.Item label="角色">
                 {getFieldDecorator('role_id', {
@@ -335,6 +340,15 @@ class User extends Component {
                   notFoundContent="暂未找到"
                   placeholder="请选择所属角色" >
                   {roles}
+                </Select>)}
+              </Form.Item>
+              <Form.Item label="性别">
+                {getFieldDecorator('sex', {
+                  rules: [{ message: '请选择性别' }]
+                })(<Select
+                  notFoundContent="暂未找到"
+                  placeholder="请选择性别" >
+                  {sexs}
                 </Select>)}
               </Form.Item>
               <Form.Item label="个性签名">
