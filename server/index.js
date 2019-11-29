@@ -1,24 +1,40 @@
-let express = require('express');
-let cors = require('cors');
+var express = require('express');
+var cors = require('cors');
+var axios = require('axios')
+var bodyParser = require('body-parser');
+var app = express();
 
-let app = express();
 app.use(cors())
 
-// 公司管理
-let company = require('./company')
-app.use(company)
-// // 角色管理
-// let role = require('./role')
-// app.use(role)
-// // 用户管理
-// let user = require('./user')
-// app.use(user)
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: false }))
 
-let server = app.listen(9000, function () {
+app.get('/getTypeList', function (req, res) {
+  // res.send('Hello World');
+  axios.get('https://0az3korx.qcloud.la/weapp/getTypeList').then(response => {
+    console.log('getTypeList', response.data)
+    res.send(response.data)
+  }).catch(err => {
+    console.log('err', err)
+  })
+})
+
+app.post('/userLogin', function (req, res) {
+  // res.send('Hello World');
+  // return console.log('req.body', req.body)
+  // console.log('userLogin', req.query)
+  axios.post('https://0az3korx.qcloud.la/weapp/userLogin', req.body).then(response => {
+    res.send(response.data)
+  }).catch(err => {
+    console.log('err', err)
+  })
+})
+
+const server = app.listen(8020, function (req, res) {
  
   let host = server.address().address
   let port = server.address().port
  
   console.log("应用实例，访问地址为 http://%s:%s", host, port)
  
-})
+});//你的端口

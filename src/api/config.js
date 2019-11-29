@@ -5,7 +5,7 @@
  * prd: 生产
  */
 
-const env = 'test';
+const env = 'prd';
 
 function useConfig() {
 
@@ -17,7 +17,7 @@ function useConfig() {
       host: '',
     },
     prd: {
-      host: '',
+      host: 'http://localhost:8020',
     }
   }[env];
 
