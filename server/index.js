@@ -1,36 +1,20 @@
 var express = require('express');
-var cors = require('cors');
-var axios = require('axios')
-var bodyParser = require('body-parser');
+var proxy = require('http-proxy-middleware');
 var app = express();
+app.use('/', proxy({
+  // 代理跨域目标接口
+  target: 'https://0az3korx.qcloud.la/weapp',
+  changeOrigin: true,
 
-app.use(cors())
+  // 修改响应头信息，实现跨域并允许带cookie
+  onProxyRes: function (proxyRes, req, res) {
+    res.header('Access-Control-Allow-Origin', '*');
+  },
+  // 修改响应信息中的cookie域名
+  //  cookieDomainRewrite: ''  // 可以为false，表示不修改
+}));
 
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: false }))
-
-app.get('/getTypeList', function (req, res) {
-  // res.send('Hello World');
-  axios.get('https://0az3korx.qcloud.la/weapp/getTypeList').then(response => {
-    console.log('getTypeList', response.data)
-    res.send(response.data)
-  }).catch(err => {
-    console.log('err', err)
-  })
-})
-
-app.post('/userLogin', function (req, res) {
-  // res.send('Hello World');
-  // return console.log('req.body', req.body)
-  // console.log('userLogin', req.query)
-  axios.post('https://0az3korx.qcloud.la/weapp/userLogin', req.body).then(response => {
-    res.send(response.data)
-  }).catch(err => {
-    console.log('err', err)
-  })
-})
-
-const server = app.listen(8020, function (req, res) {
+const server = app.listen(8020, function () {
  
   let host = server.address().address
   let port = server.address().port
