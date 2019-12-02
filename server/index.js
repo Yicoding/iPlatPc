@@ -1,6 +1,25 @@
 var express = require('express');
 var proxy = require('http-proxy-middleware');
+var cors = require('cors');
+var https = require('https');
+var http = require('http');
+var fs = require('fs');
+
+//同步读取密钥和签名证书
+var options = {
+  key: fs.readFileSync('./server.key'),
+  cert: fs.readFileSync('./server.crt')
+}
+
+console.log('options', options)
+
 var app = express();
+var httpServer = http.createServer(app);
+var httpsServer = https.createServer(options, app);
+
+
+app.use(cors());
+
 app.use('/', proxy({
   // 代理跨域目标接口
   target: 'https://0az3korx.qcloud.la/weapp',
@@ -14,11 +33,16 @@ app.use('/', proxy({
   //  cookieDomainRewrite: ''  // 可以为false，表示不修改
 }));
 
-const server = app.listen(8020, function () {
+//https监听3000端口
+httpsServer.listen(3000);
+//http监听3001端口
+httpServer.listen(3001);
+
+// const server = app.listen(3000, function () {
  
-  let host = server.address().address
-  let port = server.address().port
+//   let host = server.address().address
+//   let port = server.address().port
  
-  console.log("应用实例，访问地址为 http://%s:%s", host, port)
+//   console.log("应用实例 hhh，访问地址为 http://%s:%s", host, port)
  
-});//你的端口
+// });//你的端口

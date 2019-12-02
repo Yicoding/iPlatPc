@@ -17,7 +17,7 @@ function useConfig() {
       host: '',
     },
     prd: {
-      host: 'http://localhost:8020',
+      host: 'https://ilovelyplat.com:3000',
     }
   }[env];
 

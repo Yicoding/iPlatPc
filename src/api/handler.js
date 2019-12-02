@@ -10,7 +10,8 @@ export function promiseHandler(options) {
     // }
     let requestBody = {
       method: options.method,
-      url: options.url
+      url: options.url,
+      headers: {'Content-Type': 'application/json'}
     }
     let key = (options.method === 'POST' || options.method === 'PUT') ? 'data' : 'params'
     requestBody[key] = options.data
