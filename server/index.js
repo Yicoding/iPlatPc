@@ -4,7 +4,7 @@ var cors = require('cors');
 var https = require('https');
 var http = require('http');
 var fs = require('fs');
-
+ 
 //同步读取密钥和签名证书
 var options = {
   key: fs.readFileSync('./server.key'),
@@ -37,12 +37,3 @@ app.use('/', proxy({
 httpsServer.listen(3000);
 //http监听3001端口
 httpServer.listen(3001);
-
-// const server = app.listen(3000, function () {
- 
-//   let host = server.address().address
-//   let port = server.address().port
- 
-//   console.log("应用实例 hhh，访问地址为 http://%s:%s", host, port)
- 
-// });//你的端口
