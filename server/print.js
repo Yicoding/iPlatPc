@@ -62,23 +62,22 @@ app.post('/printOrderById', async function (req, res) {
     var str = goodList.map(item => {
         return `<FS>${item.name} ${item.sale} x${item.num}${item.unitType == 1 ? item.unitSingle : item.unitAll} ${item.total}</FS>\n`
       }).join('');
-    var content = `<FS2>**#恒祥茶庄**</FS2>\n`;
-    content += `${'.'.repeat(40)}\n`;
-    content += `订单时间:${changeDate(new Date(), 'yyyy-MM-dd HH:mm')}\n`;
-    content += `订单编号:${data.data.id}\n`;
-    content += `${'*'.repeat(20)}商品${'*'.repeat(20)}\n`;
+    var content = `<FS2><center>恒祥茶庄</center></FS2>\n`;
+    content += `订单时间：${changeDate(new Date(), 'yyyy-MM-dd HH:mm')}\n`;
+    content += `订单编号：${data.data.id}\n`;
+    content += `${'.'.repeat(48)}\n\n`;
     content += `<table>`;
     content += `<tr><td>商品名</td><td>单价</td><td>  数量</td><td>合计(元)</td></tr>`;
     for (let i = 0; i < goodList.length; i ++) {
     	const item = goodList[i];
-    	content += `<tr><td>${item.name}</td><td>${item.sale}</td><td>x${item.num}${item.unitType == 1 ? item.unitSingle : item.unitAll}</td><td>${item.total}</td></tr>`;
+    	content += `<tr><td>${item.name}</td><td>${item.sale}</td><td>${item.num}${item.unitType == 1 ? item.unitSingle : item.unitAll}</td><td>${item.total}</td></tr>`;
     }
     content += `</table>`;
-    content += `${'.'.repeat(40)}\n`;
-    content += `订单总价: ¥ ${data.data.total} 元\n`;
-    content += `<FS2>**#end**</FS2>`;
-    // return console.log('content', content)
-    // await Print.cancelall('4004632435', 'orderNo1');
+    content += `\n${'.'.repeat(48)}\n\n`;
+    content += `<FS>订单总价: ¥ ${data.data.total} 元</FS>\n\n`;
+    content += `<FS>联系电话：13863230198</FS>\n`;
+    content += `<FS>..........13465949289</FS>\n\n`;
+    content += `<FS>联系地址：滕州市荆河西路天牛煎饼机场西 土产烟花</FS>`;
     await Print.index('4004632435', 'orderNo1', content);
     res.status(200).send({
       code: 0,
