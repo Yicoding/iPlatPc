@@ -1,5 +1,13 @@
 .app{
   height: 100%;
+  .header{
+    color: #fff;
+    display: flex;
+    justify-content: space-between;
+    .name{
+      color: #1890ff;
+    }
+  }
   .logo{
     height: 64px;
     padding: 16px;

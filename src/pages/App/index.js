@@ -5,9 +5,13 @@ import Store from '../../common/js/storage'
 
 import {
   Icon,
+  Menu,
+  Modal,
   Layout,
-  message
+  message,
+  Dropdown,
 } from 'antd';
+
 
 import Routes from '../../routes';
 import SlideMenu from '../../components/SlideMenu';
@@ -15,14 +19,39 @@ import SlideMenu from '../../components/SlideMenu';
 const { Header, Content } = Layout;
 
 class App extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      collapsed: false,
+      role: '',
+    };
+  }
   userInfoStore = Store.userInfoStore
-  state = {
-    collapsed: false,
-    role: '',
-  };
+  menu = (
+    <Menu>
+      <Menu.Item key="0">
+        <span onClick={() => this.showDeleteConfirm()}>退出</span>
+      </Menu.Item>
+    </Menu>
+  )
   // 页面初始化
   componentWillMount() {
     this.getLogin()
+  }
+  // 删除按钮
+  showDeleteConfirm() {
+    Modal.confirm({
+      title: '确认要退出吗?',
+      okText: '确定',
+      okType: 'danger',
+      cancelText: '取消',
+      onOk: () => {
+        console.log('OK');
+        this.userInfoStore.remove();
+        this.props.history.replace('/login');
+        console.log(this.props.history)
+      },
+    });
   }
   // 用户登录获取角色
   getLogin() {
@@ -67,21 +96,28 @@ class App extends Component {
       collapsed: !this.state.collapsed,
     });
   }
+
   render() {
-    let {
+    const {
       role,
       collapsed
     } = this.state
+    const { userInfo } = this.props;
     return (
       <Layout className="app">
         <SlideMenu role={role} collapsed={collapsed} />
         <Layout>
-          <Header>
+          <Header className="header">
             <Icon
               className="trigger"
               type={collapsed ? 'menu-unfold' : 'menu-fold'}
               onClick={this.toggle}
             />
+            <Dropdown overlay={this.menu}>
+              <div className="name">
+                {userInfo.name} <Icon type="down" />
+              </div>
+            </Dropdown>
           </Header>
           <Content style={{
             margin: '24px 16px', padding: 24, background: '#fff', minHeight: 280
@@ -96,14 +132,14 @@ class App extends Component {
 }
 
 
-const mapStateToProps = function(store) {
+const mapStateToProps = function (store) {
   return {
     userInfo: store.userInfo,
     company_id: store.company_id
   };
 };
 
-const mapDispatchToProps = function(dispatch, ownProps) {
+const mapDispatchToProps = function (dispatch, ownProps) {
   return {
     loginOk: (data) => {
       dispatch(setUserInfo(data))

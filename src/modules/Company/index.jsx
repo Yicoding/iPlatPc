@@ -19,9 +19,24 @@ class Company extends Component {
     { title: 'id', dataIndex: 'id', key: 'id', align: 'center' },
     { title: '公司名称', dataIndex: 'name', key: 'name', align: 'center', render: (text, record) => <Button onClick={() => this.jumpCompany(record)} type="link">{text}</Button> },
     { title: '创建时间', dataIndex: 'createTime', key: 'createTime', align: 'center' },
-    { title: '公司地址', dataIndex: 'address', key: 'address', align: 'center' },
-    { title: '联系电话', dataIndex: 'tel', key: 'tel', align: 'center' },
-    { title: '联系手机', dataIndex: 'phone', key: 'phone', align: 'center' },
+    { title: '公司地址', dataIndex: 'address', key: 'address', align: 'center', render: (text) => {
+      if (!text) {
+        return '--';
+      }
+      return text;
+    } },
+    { title: '联系电话', dataIndex: 'tel', key: 'tel', align: 'center', render: (text) => {
+      if (!text) {
+        return '--';
+      }
+      return text;
+    } },
+    { title: '联系手机', dataIndex: 'phone', key: 'phone', align: 'center', render: (text) => {
+      if (!text) {
+        return '--';
+      }
+      return text;
+    } },
     { title: '操作', key: 'edit', align: 'center', render: (text) => (
       <div>
         <Button className="right-space" icon="edit" onClick={() => this.edit(text)}>编辑</Button>
