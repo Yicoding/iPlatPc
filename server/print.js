@@ -37,7 +37,7 @@ app.post('/printOrderById', async function (req, res) {
     const { id } = req.body;
     const { data } = await axios.post('https://ilovelyplat.com:3000/printOrderById', { id });
     // const { data } = await axios.post('http://localhost:3001/printOrderById', { id });
-    const { goodList } = data.data;
+    const { goodList, createTime, company } = data.data;
     // 获取调用凭证（仅调用一次后关闭此方法）
     // const result = await oauthClient.getToken();
     // if (
@@ -62,8 +62,9 @@ app.post('/printOrderById', async function (req, res) {
     var str = goodList.map(item => {
         return `<FS>${item.name} ${item.sale} x${item.num}${item.unitType == 1 ? item.unitSingle : item.unitAll} ${item.total}</FS>\n`
       }).join('');
-    var content = `<FS2><center>恒祥茶庄</center></FS2>\n`;
-    content += `订单时间：${changeDate(new Date(), 'yyyy-MM-dd HH:mm')}\n`;
+    var content = `<FS2><center>${company.name}</center></FS2>\n`;
+    content += `订单创建时间：${createTime.slice(0, -3)}\n`;
+    content += `订单打印时间：${changeDate(new Date(), 'yyyy-MM-dd HH:mm')}\n`;
     content += `订单编号：${data.data.id}\n`;
     content += `${'.'.repeat(48)}\n\n`;
     content += `<table>`;
@@ -75,9 +76,11 @@ app.post('/printOrderById', async function (req, res) {
     content += `</table>`;
     content += `\n${'.'.repeat(48)}\n\n`;
     content += `<FS>订单总价: ¥ ${data.data.total} 元</FS>\n\n`;
-    content += `<FS>联系电话：13863230198</FS>\n`;
-    content += `<FS>..........13465949289</FS>\n\n`;
-    content += `<FS>联系地址：滕州市荆河西路天牛煎饼机场西 土产烟花</FS>`;
+    content += `<FS>联系电话：${company.tel}</FS>\n`;
+    if (company.phone) {
+      content += `<FS>..........${company.phone}</FS>\n\n`;
+    }
+    content += `<FS>联系地址：${company.address}</FS>`;
     await Print.index('4004632435', 'orderNo1', content);
     res.status(200).send({
       code: 0,

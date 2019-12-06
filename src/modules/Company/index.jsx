@@ -19,6 +19,9 @@ class Company extends Component {
     { title: 'id', dataIndex: 'id', key: 'id', align: 'center' },
     { title: '公司名称', dataIndex: 'name', key: 'name', align: 'center', render: (text, record) => <Button onClick={() => this.jumpCompany(record)} type="link">{text}</Button> },
     { title: '创建时间', dataIndex: 'createTime', key: 'createTime', align: 'center' },
+    { title: '公司地址', dataIndex: 'address', key: 'address', align: 'center' },
+    { title: '联系电话', dataIndex: 'tel', key: 'tel', align: 'center' },
+    { title: '联系手机', dataIndex: 'phone', key: 'phone', align: 'center' },
     { title: '操作', key: 'edit', align: 'center', render: (text) => (
       <div>
         <Button className="right-space" icon="edit" onClick={() => this.edit(text)}>编辑</Button>
@@ -62,7 +65,10 @@ class Company extends Component {
     form.setFieldsValue({
       name: '',
       desc: '',
-      logo: ''
+      logo: '',
+      address: '',
+      tel: '',
+      phone: ''
     });
     this.setState({
       title: '新增公司',
@@ -78,7 +84,10 @@ class Company extends Component {
     form.setFieldsValue({
       name: text.name,
       desc: text.desc,
-      logo: text.logo
+      logo: text.logo,
+      address: text.address,
+      tel: text.tel,
+      phone: text.phone
     });
     this.setState({
       title: '编辑公司',
@@ -137,7 +146,10 @@ class Company extends Component {
             createTime: data.createTime,
             name: values.name,
             desc: values.desc,
-            logo: values.logo
+            logo: values.logo,
+            address: values.address,
+            tel: values.tel,
+            phone: values.phone,
           })
           this.setState({ dataList })
         } else {
@@ -150,7 +162,10 @@ class Company extends Component {
           Object.assign(item, {
             name: values.name,
             desc: values.desc,
-            logo: values.logo 
+            logo: values.logo,
+            address: values.address,
+            tel: values.tel,
+            phone: values.phone
           })
         }
         this.setState({
@@ -209,7 +224,16 @@ class Company extends Component {
                 {getFieldDecorator('desc')(<Input className="form-input" placeholder="请输入公司描述称" />)}
               </Form.Item>
               <Form.Item label="公司logo">
-                {getFieldDecorator('logo')(<Input className="form-input" placeholder="请输入公司logo地址" />)}
+                {getFieldDecorator('logo')(<Input className="form-input" placeholder="请输入公司logo" />)}
+              </Form.Item>
+              <Form.Item label="公司地址">
+                {getFieldDecorator('address')(<Input className="form-input" placeholder="请输入公司地址" />)}
+              </Form.Item>
+              <Form.Item label="联系电话">
+                {getFieldDecorator('tel')(<Input className="form-input" placeholder="请输入联系电话" />)}
+              </Form.Item>
+              <Form.Item label="联系手机">
+                {getFieldDecorator('phone')(<Input className="form-input" placeholder="请输入联系手机" />)}
               </Form.Item>
             </Form>
         </Modal>
