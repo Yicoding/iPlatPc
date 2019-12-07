@@ -1,6 +1,13 @@
 var https = require('https');
 var http = require('http');
 var fs = require('fs');
+var multipart = require('connect-multiparty');
+var COS = require('cos-nodejs-sdk-v5');
+
+var multipartMiddleware = multipart();
+
+var cosconfig = require('./cosconfig');
+
 
 var express = require('express');
 var cors = require('cors');
@@ -60,8 +67,8 @@ app.post('/printOrderById', async function (req, res) {
     var RpcClient = new yly.RpcClient(tokenData.accessToken, config);
     var Print = new yly.Print(RpcClient);
     var str = goodList.map(item => {
-        return `<FS>${item.name} ${item.sale} x${item.num}${item.unitType == 1 ? item.unitSingle : item.unitAll} ${item.total}</FS>\n`
-      }).join('');
+      return `<FS>${item.name} ${item.sale} x${item.num}${item.unitType == 1 ? item.unitSingle : item.unitAll} ${item.total}</FS>\n`
+    }).join('');
     var content = `<FS2><center>${company.name}</center></FS2>\n`;
     content += `订单创建时间：${createTime.slice(0, -3)}\n`;
     content += `订单打印时间：${changeDate(new Date(), 'yyyy-MM-dd HH:mm')}\n`;
@@ -69,9 +76,9 @@ app.post('/printOrderById', async function (req, res) {
     content += `${'.'.repeat(48)}\n\n`;
     content += `<table>`;
     content += `<tr><td>商品名</td><td>单价</td><td>  数量</td><td>合计(元)</td></tr>`;
-    for (let i = 0; i < goodList.length; i ++) {
-    	const item = goodList[i];
-    	content += `<tr><td>${item.name}</td><td>${item.sale}</td><td>${item.num}${item.unitType == 1 ? item.unitSingle : item.unitAll}</td><td>${item.total}</td></tr>`;
+    for (let i = 0; i < goodList.length; i++) {
+      const item = goodList[i];
+      content += `<tr><td>${item.name}</td><td>${item.sale}</td><td>${item.num}${item.unitType == 1 ? item.unitSingle : item.unitAll}</td><td>${item.total}</td></tr>`;
     }
     content += `</table>`;
     content += `\n${'.'.repeat(48)}\n\n`;
@@ -93,6 +100,110 @@ app.post('/printOrderById', async function (req, res) {
     })
   }
 })
+
+// 文件上传配置
+var cos = new COS({
+  // 必选参数
+  SecretId: cosconfig.SecretId,
+  SecretKey: cosconfig.SecretKey,
+  // 可选参数
+  FileParallelLimit: 3,    // 控制文件上传并发数
+  ChunkParallelLimit: 8,   // 控制单个文件下分片上传并发数，在同园区上传可以设置较大的并发数
+  ChunkSize: 1024 * 1024 * 8,  // 控制分片大小，单位 B，在同园区上传可以设置较大的分片大小
+  Proxy: '',
+});
+
+// 列出存储桶列表
+app.get('/getService', async function (req, res) {
+  try {
+    cos.getService({
+      Region: 'ap-guangzhou',
+    }, function (err, data) {
+      if (err) {
+        console.log('err', err);
+        return res.status(500).send({
+          code: 500,
+          errMsg: err
+        })
+      }
+      console.log('data', data);
+      res.status(200).send({
+        code: 0,
+        data
+      })
+    });
+  } catch (err) {
+    console.log('err', err);
+    res.status(500).send({
+      code: 500,
+      errMsg: err
+    });
+  }
+});
+
+// 列出某个目录的所有文件
+app.get('/getBucket', async function (req, res) {
+  try {
+    cos.getBucket({
+      Bucket: 'qcloudtest-1257454171',
+      Region: 'ap-guangzhou',
+      Prefix: 'food/'
+    }, function (err, data) {
+      if (err) {
+        console.log('err', err);
+        return res.status(500).send({
+          code: 500,
+          errMsg: err
+        })
+      }
+      console.log('data', data);
+      res.status(200).send({
+        code: 0,
+        data
+      })
+    });
+  } catch (err) {
+    console.log('err', err);
+    res.status(500).send({
+      code: 500,
+      errMsg: err
+    });
+  }
+});
+
+// 上传文件
+app.post('/putObject', multipartMiddleware, function (req, res) {
+  try {
+    const { file: { path } } = req.files;
+    // return console.log('files', req.files)
+    cos.putObject({
+      Bucket: 'qcloudtest-1257454171',
+      Region: 'ap-guangzhou',
+      Key: `picture_${Math.random().toString().slice(-8)}.jpg`,
+      Body: fs.createReadStream(path)
+    }, function (err, data) {
+      if (err) {
+        console.log('err', err);
+        return res.status(500).send({
+          code: 500,
+          errMsg: err
+        })
+      }
+      console.log('data', data);
+      res.status(200).send({
+        code: 0,
+        data
+      })
+    });
+  } catch (err) {
+    console.log('err', err);
+    res.status(500).send({
+      code: 500,
+      errMsg: err
+    });
+  }
+});
+
 
 //https监听3000端口
 httpsServer.listen(3002);
