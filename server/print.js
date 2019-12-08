@@ -179,7 +179,7 @@ app.post('/putObject', multipartMiddleware, function (req, res) {
     cos.putObject({
       Bucket: 'qcloudtest-1257454171',
       Region: 'ap-guangzhou',
-      Key: `picture_${Math.random().toString().slice(-8)}.jpg`,
+      Key: `good/picture_${Math.random().toString().slice(-8)}.png`,
       Body: fs.createReadStream(path)
     }, function (err, data) {
       if (err) {
