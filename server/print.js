@@ -73,6 +73,15 @@ app.post('/printOrderById', async function (req, res) {
     content += `订单创建时间：${createTime.slice(0, -3)}\n`;
     content += `订单打印时间：${changeDate(new Date(), 'yyyy-MM-dd HH:mm')}\n`;
     content += `订单编号：${data.data.id}\n`;
+    if (data.data.customerName) {
+      content += `客户姓名：${data.data.customerName}\n`;
+    }
+    if (data.data.customerPhone) {
+      content += `客户手机：${data.data.customerPhone}\n`;
+    }
+    if (data.data.customerSite) {
+      content += `客户地址：${data.data.customerSite}\n`;
+    }
     content += `${'.'.repeat(48)}\n\n`;
     content += `<table>`;
     content += `<tr><td>商品名</td><td>单价</td><td>  数量</td><td>合计(元)</td></tr>`;
