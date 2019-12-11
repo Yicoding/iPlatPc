@@ -96,6 +96,8 @@ app.post('/printOrderById', async function (req, res) {
       content += `<FS>..........${company.phone}</FS>\n\n`;
     }
     content += `<FS>联系地址：${company.address}</FS>`;
+    content += `\n${'.'.repeat(48)}\n\n`;
+    content += `<QR>https://open.weixin.qq.com/sns/getexpappinfo?appid=wxf2cab88a1e083fa9&path=pages%2Forder-detail%2Findex.html?id=${data.data.id}#wechat-redirect</QR>`;
     await Print.index('4004632435', 'orderNo1', content);
     res.status(200).send({
       code: 0,
