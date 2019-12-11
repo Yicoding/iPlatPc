@@ -81,10 +81,10 @@ app.post('/printOrderById', async function (req, res) {
     }
     content += `${'.'.repeat(48)}\n\n`;
     content += `<table>`;
-    content += `<tr><td>商品名</td><td>数量</td><td>单价</td><td>合计(元)</td></tr>`;
+    content += `<tr><td>商品名</td><td>数量</td><td>单价(元)</td><td>合计(元)</td></tr>`;
     for (let i = 0; i < goodList.length; i++) {
       const item = goodList[i];
-      content += `<tr><td>${item.name}</td><td>${item.num}${item.unitType == 1 ? item.unitSingle : item.unitAll}</td><td>${item.unitType == 1 ? item.sale : (item.unitDecimal + item.unitSingle + 'x' + AmtFormat(item.sale/item.unitDecimal))}</td><td>${item.total}</td></tr>`;
+      content += `<tr><td>${item.name}</td><td>${item.num}${item.unitType == 1 ? item.unitSingle : item.unitAll}</td><td>${item.sale}${item.unitType == 2 && '(' + item.unitDecimal + item.unitSingle + 'x' + (item.sale/item.unitDecimal).toFixed(2) + ')'}</td><td>${item.total}</td></tr>`;
     }
     content += `</table>`;
     content += `\n${'.'.repeat(48)}\n\n`;
@@ -244,12 +244,4 @@ function changeDate(time, format) {
         break;
     }
   })
-}
-
-function AmtFormat(val) {
-  var n = val.toString();
-  if (/\./.test(n) && n.split('.')[1].length > 2) {
-    return val.toFixed(2);
-  }
-  return val;
 }
