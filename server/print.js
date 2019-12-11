@@ -66,9 +66,6 @@ app.post('/printOrderById', async function (req, res) {
     }
     var RpcClient = new yly.RpcClient(tokenData.accessToken, config);
     var Print = new yly.Print(RpcClient);
-    var str = goodList.map(item => {
-      return `<FS>${item.name} ${item.sale} x${item.num}${item.unitType == 1 ? item.unitSingle : item.unitAll} ${item.total}</FS>\n`
-    }).join('');
     var content = `<FS2><center>${company.name}</center></FS2>\n`;
     content += `订单创建时间：${createTime.slice(0, -3)}\n`;
     content += `订单打印时间：${changeDate(new Date(), 'yyyy-MM-dd HH:mm')}\n`;
@@ -92,7 +89,9 @@ app.post('/printOrderById', async function (req, res) {
     content += `</table>`;
     content += `\n${'.'.repeat(48)}\n\n`;
     content += `<FS>订单总价: ¥ ${data.data.total} 元</FS>\n\n`;
-    content += `<FS>联系电话：${company.tel}</FS>\n`;
+    if (company.tel) {
+      content += `<FS>联系电话：${company.tel}</FS>\n`;
+    }
     if (company.phone) {
       content += `<FS>..........${company.phone}</FS>\n\n`;
     }
