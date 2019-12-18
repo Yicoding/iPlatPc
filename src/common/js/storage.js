@@ -54,11 +54,11 @@ class StoreBase{
         }
     }
     // 合并值
-    assignObj(value) {
+    merge(value) {
         this.set(value, true)
     }
     // 改变单个字段的值
-    setAttrValue(name, value) {
+    setAttr(name, value) {
         let oldVal = JSON.parse(storage.getItem(this.key))
         // 存储日期
         let saveDate = changeDate(Date.now(), 'yyyy-MM-dd HH:mm:ss')
