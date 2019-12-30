@@ -84,7 +84,7 @@ app.post('/printOrderById', async function (req, res) {
     content += `<tr><td>商品名</td><td>数量</td><td>  单价</td><td>合计(元)</td></tr>`;
     for (let i = 0; i < goodList.length; i++) {
       const item = goodList[i];
-      content += `<tr><td>${item.name}</td><td>${item.num}${item.unitType == 1 ? item.unitSingle : item.unitAll}</td><td>${item.unitType == 1 ? item.sale : (item.unitDecimal + item.unitSingle + 'x' + AmtFormat(item.sale/item.unitDecimal))}</td><td>${item.total}</td></tr>`;
+      content += `<tr><td>${item.name}</td><td>${item.num}${item.unitType == 1 ? item.unitSingle : item.unitAll}</td><td>${item.unitType == 1 ? item.sale : (item.unitDecimal + item.unitSingle + 'x' + AmtFormat(item.sale / item.unitDecimal))}</td><td>${item.total}</td></tr>`;
     }
     content += `</table>`;
     content += `\n${'.'.repeat(48)}\n\n`;
@@ -214,6 +214,27 @@ app.post('/putObject', multipartMiddleware, function (req, res) {
   }
 });
 
+// 用户登录
+app.get('/getOpenId', async function (req, res) {
+  try {
+    const { code } = req.query;
+    const { data } = await axios.get('https://api.weixin.qq.com/sns/jscode2session', {
+      params: {
+        appid: 'wxa951826c9c76290b',
+        secret: '67957573d25420da690f4c6798e0e8a8',
+        js_code: code,
+        grant_type: 'authorization_code'
+      }
+    });
+    res.status(200).send({ code: 0, data });
+  } catch (err) {
+    console.log('err', err);
+    res.status(500).send({
+      code: 500,
+      errMsg: err
+    });
+  }
+});
 
 //https监听3000端口
 httpsServer.listen(3002);
