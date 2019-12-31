@@ -3,6 +3,7 @@ var http = require('http');
 var fs = require('fs');
 var multipart = require('connect-multiparty');
 var COS = require('cos-nodejs-sdk-v5');
+const yly = require('yly-nodejs-sdk');
 
 var multipartMiddleware = multipart();
 
