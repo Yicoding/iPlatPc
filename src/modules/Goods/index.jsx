@@ -375,7 +375,7 @@ class Goods extends Component {
           showQuickJumper
           current={pageIndex+1}
           defaultPageSize={pageSize}
-          pageSizeOptions={['1', '3', '10', '20', '50', '100']}
+          pageSizeOptions={['1', '3', '10', '20', '50', '100', '500']}
         />
         <Modal
           title={title}
