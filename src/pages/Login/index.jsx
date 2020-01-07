@@ -33,14 +33,14 @@ class Login extends Component {
         return console.log('handleOkError', err)
       }
       console.log('form', values)
-      this.userLogin(values)
+      this.loginByWx(values)
     });
   }
   // 用户登录
-  async userLogin(values) {
+  async loginByWx(values) {
     const { loginOk } = this.props
     try {
-      let { code, data } = await api.userLogin(values)
+      let { code, data } = await api.loginByWx(values)
       console.log(data);
       if (code === 0) {
         message.success('恭喜你，登录成功');
@@ -66,7 +66,7 @@ class Login extends Component {
           <p className="login-title">系统登录</p>
           <Form onSubmit={handleSubmit}>
               <Form.Item>
-                {getFieldDecorator('name', {
+                {getFieldDecorator('phone', {
                   rules: [{ required: true, whitespace: true, message: '请输入账号' }]
                 })(<Input placeholder="账号" size="large" prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} />)}
               </Form.Item>

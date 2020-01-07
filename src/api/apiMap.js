@@ -20,7 +20,7 @@ let apiMap = {
   // 用户
   getUserList: ['GET', '/getUserList'], // 查看用户列表
   getUserDetail: ['GET', '/getUserDetail'], // 查看单个用户详情
-  userLogin: ['POST', '/userLogin'], // 用户登录
+  loginByWx: ['POST', '/loginByWx'], // 用户登录
   addUser: ['POST', '/addUser'], // 新增用户
   updateUser: ['PUT', '/updateUser'], // 更新单个用户
   removeUser: ['PUT', '/removeUser'], // 删除单个用户
